@@ -1,20 +1,9 @@
 <!DOCTYPE html>
 <html lang="id" class="light">
-<!-- 
-	Daftar Update
-        /* Memasukkan fitur login admin dan operator */
-	/* Bukan admin atau operator hanya bisa melihat transaksi harian dan stok */
-        /* Menghilangkan kotak input di samping, dan membuatnya menjadi jendela pop up */
-        /* Membuat tab transaksi harian sehingga ada pemisahan antara stok terkini dan transaksi harian */
-	- [18/09/2026] Menambahkan Tab Lokasi, Fitur Lupa/Reset Password, Penambahan kalender pada jendela popup transaksi
-	- [19/09/2026] Menambahkan Fitur Edit di tab Transaksi, Edit yang di lakukan harus memasukkan PIN/Password
-
--->
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MDI - Dashboard Inventaris (Pro UI v3)</title>
+    <title>MDI - Dashboard Inventaris (Pro UI v3.1)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,7 +41,7 @@
         </div>
     </div>
 
-    <!-- MODAL VERIFIKASI KEAMANAN (BARU) -->
+    <!-- MODAL VERIFIKASI KEAMANAN -->
     <div id="modalVerifikasi" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-rose-600 dark:text-rose-500"><i class="fa-solid fa-shield-halved mr-2"></i>Verifikasi Keamanan</h3><button onclick="tutupModal('modalVerifikasi')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div>
@@ -87,7 +76,7 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT TRANSAKSI (BARU) -->
+    <!-- MODAL EDIT TRANSAKSI -->
     <div id="modalEditTransaksi" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
             <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-pen-to-square text-amber-500 mr-2"></i>Edit Transaksi</h3><button onclick="tutupModal('modalEditTransaksi')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div>
@@ -111,7 +100,7 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH BARANG & KATEGORI (Tetap Sama) -->
+    <!-- MODAL TAMBAH BARANG & KATEGORI -->
     <div id="modalBarang" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300"><div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-box-open text-indigo-500 mr-2"></i>Daftarkan Item Baru</h3><button onclick="tutupModal('modalBarang')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div><form id="formTambahBarang" onsubmit="handleTambahBarang(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto"><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Item Lengkap</label><input type="text" id="newName" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kategori Item</label><select id="newCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></select></div><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi / Ruangan</label><input type="text" id="newLokasi" placeholder="Contoh: Gudang Belakang" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Satuan</label><input type="text" id="newUnit" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Batas Min</label><input type="number" id="newMin" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div></div><button type="submit" id="btnSubmitBaru" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm">Simpan Master Data</button></form></div></div>
     <div id="modalKategori" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300"><div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-tags text-purple-500 mr-2"></i>Tambah Kategori</h3><button onclick="tutupModal('modalKategori')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div><form id="formTambahKategori" onsubmit="handleTambahKategori(event)" class="p-6 space-y-4"><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Kategori Baru</label><input type="text" id="namaKategoriBaru" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><button type="submit" id="btnSubmitKat" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-sm">Simpan Kategori</button></form></div></div>
 
@@ -154,18 +143,36 @@
                 </div>
             </div>
 
-            <!-- ISI TAB 1: STOK -->
+            <!-- ISI TAB 1: STOK (SUDAH DIPISAH KOLOM LOKASINYA) -->
             <div id="tabStok" class="tab-content active overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[700px]">
-                    <thead><tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800"><th class="py-4 px-5 w-32">ID Barang</th><th class="py-4 px-5">Nama & Lokasi</th><th class="py-4 px-5">Kategori</th><th class="py-4 px-5 text-right">Sisa Stok</th><th class="py-4 px-5 text-center">Status</th></tr></thead>
+                <table class="w-full text-left border-collapse min-w-[750px]">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                            <th class="py-4 px-5 w-32">ID Barang</th>
+                            <th class="py-4 px-5">Nama Item</th>
+                            <th class="py-4 px-5">Lokasi</th>
+                            <th class="py-4 px-5">Kategori</th>
+                            <th class="py-4 px-5 text-right">Sisa Stok</th>
+                            <th class="py-4 px-5 text-center">Status</th>
+                        </tr>
+                    </thead>
                     <tbody id="inventoryTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
                 </table>
             </div>
 
-            <!-- ISI TAB 2: RIWAYAT -->
+            <!-- ISI TAB 2: RIWAYAT (SUDAH DIPISAH KOLOM LOKASINYA) -->
             <div id="tabRiwayat" class="tab-content overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[700px]">
-                    <thead><tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800"><th class="py-4 px-5">Waktu & Tanggal</th><th class="py-4 px-5">Nama Item & Lokasi</th><th class="py-4 px-5">Mutasi</th><th class="py-4 px-5 text-right">Jumlah</th><th class="py-4 px-5 text-center">Aksi</th></tr></thead>
+                <table class="w-full text-left border-collapse min-w-[750px]">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                            <th class="py-4 px-5 w-40">Waktu & Tanggal</th>
+                            <th class="py-4 px-5">Nama Item</th>
+                            <th class="py-4 px-5">Lokasi & Catatan</th>
+                            <th class="py-4 px-5">Mutasi</th>
+                            <th class="py-4 px-5 text-right">Jumlah</th>
+                            <th class="py-4 px-5 text-center">Aksi</th>
+                        </tr>
+                    </thead>
                     <tbody id="riwayatTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
                 </table>
             </div>
@@ -188,7 +195,7 @@
 
         let inventoryData = []; let riwayatData = []; let daftarKategori = [];
         let currentUser = null; let userRole = 'viewer'; let tabAktif = 'stok';
-        let idTransaksiYangMauDiedit = null; // Menyimpan ID transaksi untuk diedit
+        let idTransaksiYangMauDiedit = null;
 
         // 1. OTENTIKASI
         async function cekSesiAktif() {
@@ -211,7 +218,7 @@
             } else {
                 btnLogin.classList.remove('hidden'); userInfo.classList.add('hidden'); btnKat.classList.add('hidden'); btnItem.classList.add('hidden'); btnTrans.classList.add('hidden'); statusBadge.innerHTML = `<i class="fa-solid fa-globe text-emerald-500 mr-1"></i> Mode Tamu (Hanya Lihat)`;
             }
-            renderTables(); // Re-render table to show/hide edit buttons based on role
+            renderTables();
         }
 
         async function handleLogin(e) {
@@ -229,32 +236,26 @@
         }
         async function handleLogout() { await supabaseClient.auth.signOut(); showToast("Berhasil keluar.", "info"); cekSesiAktif(); }
 
-        // 2. AMBIL & OLAH DATA DARI SUPABASE
+        // 2. DATA (PERBAIKAN TRAILING SPACE & LOKASI OTOMATIS)
         async function muatDataDariSupabase() {
             document.getElementById('recordCountInfo').textContent = 'Mengambil data server...';
             try {
-                let { data: katData } = await supabaseClient.from('kategori').select('*');
-                daftarKategori = katData ? katData.map(k => k.nama_kategori) : [];
-
+                let { data: katData } = await supabaseClient.from('kategori').select('*'); daftarKategori = katData ? katData.map(k => k.nama_kategori) : [];
                 let { data: masterData } = await supabaseClient.from('master_barang').select('*');
                 let { data: transData } = await supabaseClient.from('transaksi').select('*').order('created_at', { ascending: false });
                 riwayatData = transData || []; 
 
                 inventoryData = (masterData || []).map(item => {
                     let totalStok = 0; 
-                    
-                    // PERBAIKAN 1: Kita gunakan ID Barang sebagai kunci pencocokan yang anti-gagal
                     let idPencarian = `[${item.id}]`;
                     let lokasiAktif = item.lokasi && item.lokasi !== '-' ? item.lokasi : '-';
 
-                    // PERBAIKAN 2: Deteksi lokasi terakhir otomatis dari riwayat transaksi
                     let transaksiTerbaru = riwayatData.find(t => t.nama_item && t.nama_item.startsWith(idPencarian));
                     if (transaksiTerbaru && transaksiTerbaru.lokasi) {
                         lokasiAktif = transaksiTerbaru.lokasi;
                     }
 
                     riwayatData.forEach(t => {
-                        // Sistem sekarang mencocokkan [MDI-XXXX] alih-alih nama penuh
                         if (t.nama_item && t.nama_item.startsWith(idPencarian)) {
                             let qty = parseFloat(t.jumlah) || 0;
                             if (t.tipe === 'Masuk') totalStok += qty; 
@@ -262,102 +263,48 @@
                         }
                     });
 
-                    return { 
-                        id: item.id, 
-                        name: item.nama_item, 
-                        category: item.kategori, 
-                        unit: item.satuan, 
-                        minStock: parseFloat(item.batas_min) || 0, 
-                        stock: totalStok, 
-                        lokasi: lokasiAktif 
-                    };
+                    return { id: item.id, name: item.nama_item, category: item.kategori, unit: item.satuan, minStock: parseFloat(item.batas_min) || 0, stock: totalStok, lokasi: lokasiAktif };
                 });
-
-                populateSelectOptions(); populateCategoryDropdowns(); renderTables(); updateStats();
-                document.getElementById('recordCountInfo').textContent = `Sinkronisasi Selesai.`;
+                populateSelectOptions(); populateCategoryDropdowns(); renderTables(); updateStats(); document.getElementById('recordCountInfo').textContent = `Sinkronisasi Selesai.`;
             } catch (error) { console.error(error); }
         }
 
-        // 3. EDIT TRANSAKSI (STEP-UP AUTH)
-        function pemicuEditTransaksi(idTrans) {
-            idTransaksiYangMauDiedit = idTrans;
-            document.getElementById('verifyPassword').value = '';
-            bukaModal('modalVerifikasi'); // Minta password dulu
-        }
-
+        // 3. EDIT TRANSAKSI
+        function pemicuEditTransaksi(idTrans) { idTransaksiYangMauDiedit = idTrans; document.getElementById('verifyPassword').value = ''; bukaModal('modalVerifikasi'); }
         async function prosesVerifikasi(e) {
-            e.preventDefault();
-            const pass = document.getElementById('verifyPassword').value;
-            const btn = document.getElementById('btnVerify'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            
-            // Cek password menggunakan sistem Auth Supabase
+            e.preventDefault(); const pass = document.getElementById('verifyPassword').value; const btn = document.getElementById('btnVerify'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
             const { error } = await supabaseClient.auth.signInWithPassword({ email: currentUser.email, password: pass });
-            
             btn.innerHTML = 'Verifikasi & Lanjutkan'; btn.disabled = false;
-            
-            if (error) {
-                showToast("Password salah! Verifikasi ditolak.", "error");
-            } else {
-                tutupModal('modalVerifikasi');
-                bukaFormEditSebenarnya(idTransaksiYangMauDiedit);
-            }
+            if (error) { showToast("Password salah! Verifikasi ditolak.", "error"); } else { tutupModal('modalVerifikasi'); bukaFormEditSebenarnya(idTransaksiYangMauDiedit); }
         }
-
         function bukaFormEditSebenarnya(id) {
-            const dataRow = riwayatData.find(r => r.id === id);
-            if(!dataRow) return showToast("Data tidak ditemukan", "error");
-
-            document.getElementById('editTransId').value = dataRow.id;
-            document.getElementById('editItemName').textContent = dataRow.nama_item;
-            document.getElementById('editLokasi').value = dataRow.lokasi || '';
-            document.getElementById('editQty').value = dataRow.jumlah;
-            document.getElementById('editNotes').value = dataRow.catatan || '';
-            
-            // Format format datetime-local (YYYY-MM-DDTHH:MM)
-            const d = new Date(dataRow.created_at); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-            document.getElementById('editTanggal').value = d.toISOString().slice(0,16);
-
-            if(dataRow.tipe === 'Masuk') document.getElementById('editMutMasuk').checked = true;
-            else document.getElementById('editMutKeluar').checked = true;
-
+            const dataRow = riwayatData.find(r => r.id === id); if(!dataRow) return showToast("Data tidak ditemukan", "error");
+            document.getElementById('editTransId').value = dataRow.id; document.getElementById('editItemName').textContent = dataRow.nama_item;
+            document.getElementById('editLokasi').value = dataRow.lokasi || ''; document.getElementById('editQty').value = dataRow.jumlah; document.getElementById('editNotes').value = dataRow.catatan || '';
+            const d = new Date(dataRow.created_at); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); document.getElementById('editTanggal').value = d.toISOString().slice(0,16);
+            if(dataRow.tipe === 'Masuk') document.getElementById('editMutMasuk').checked = true; else document.getElementById('editMutKeluar').checked = true;
             bukaModal('modalEditTransaksi');
         }
-
         async function simpanEditTransaksi(e) {
-            e.preventDefault();
-            const id = document.getElementById('editTransId').value;
-            const tgl = new Date(document.getElementById('editTanggal').value).toISOString();
-            const lok = document.getElementById('editLokasi').value;
-            const mutasi = document.querySelector('input[name="editMutationType"]:checked').value;
-            const qty = parseFloat(document.getElementById('editQty').value);
-            const notes = document.getElementById('editNotes').value;
-
+            e.preventDefault(); const id = document.getElementById('editTransId').value; const tgl = new Date(document.getElementById('editTanggal').value).toISOString();
+            const lok = document.getElementById('editLokasi').value; const mutasi = document.querySelector('input[name="editMutationType"]:checked').value;
+            const qty = parseFloat(document.getElementById('editQty').value); const notes = document.getElementById('editNotes').value;
             const btn = document.getElementById('btnSubmitEdit'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            
-            // Update tabel transaksi
-            const { error } = await supabaseClient.from('transaksi').update({
-                created_at: tgl, lokasi: lok, tipe: mutasi, kategori: mutasi, jumlah: qty, catatan: notes
-            }).eq('id', id);
-
+            const { error } = await supabaseClient.from('transaksi').update({ created_at: tgl, lokasi: lok, tipe: mutasi, kategori: mutasi, jumlah: qty, catatan: notes }).eq('id', id);
             btn.innerHTML = old; btn.disabled = false;
-            if (error) showToast("Gagal mengedit: " + error.message, "error");
-            else { showToast("Transaksi berhasil diubah!", "success"); tutupModal('modalEditTransaksi'); muatDataDariSupabase(); }
+            if (error) showToast("Gagal mengedit: " + error.message, "error"); else { showToast("Transaksi berhasil diubah!", "success"); tutupModal('modalEditTransaksi'); muatDataDariSupabase(); }
         }
 
-        // 4. TRANSAKSI BARU & MASTER DATA
+        // 4. TRANSAKSI BARU & MASTER
         async function handleStockUpdate(e) {
-            e.preventDefault();
-            const itemName = document.getElementById('selectItem').options[document.getElementById('selectItem').selectedIndex].text;
-            const mutasi = document.querySelector('input[name="mutationType"]:checked').value;
-            const qty = parseFloat(document.getElementById('inputQty').value); const notes = document.getElementById('inputNotes').value;
+            e.preventDefault(); const itemName = document.getElementById('selectItem').options[document.getElementById('selectItem').selectedIndex].text;
+            const mutasi = document.querySelector('input[name="mutationType"]:checked').value; const qty = parseFloat(document.getElementById('inputQty').value); const notes = document.getElementById('inputNotes').value;
             const lok = document.getElementById('inputLokasi').value; const tgl = new Date(document.getElementById('inputTanggal').value).toISOString();
-
             const btn = document.getElementById('btnSubmitTrans'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
             const { error } = await supabaseClient.from('transaksi').insert([{ nama_item: itemName, kategori: mutasi, jumlah: qty, tipe: mutasi, lokasi: lok, created_at: tgl, catatan: notes }]);
             btn.innerHTML = old; btn.disabled = false;
             if (error) showToast('Gagal: ' + error.message, 'error'); else { showToast('Transaksi dicatat!', 'success'); document.getElementById('stockForm').reset(); tutupModal('modalTransaksi'); muatDataDariSupabase(); }
         }
-
         async function handleTambahBarang(e) {
             e.preventDefault(); const idBarang = "MDI-" + Math.floor(1000 + Math.random() * 9000);
             const btn = document.getElementById('btnSubmitBaru'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
@@ -365,7 +312,6 @@
             btn.innerHTML = old; btn.disabled = false;
             if (error) showToast('Gagal!', 'error'); else { showToast('Item ditambah!', 'success'); document.getElementById('formTambahBarang').reset(); tutupModal('modalBarang'); muatDataDariSupabase(); }
         }
-
         async function handleTambahKategori(e) {
             e.preventDefault(); const btn = document.getElementById('btnSubmitKat'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
             const { error } = await supabaseClient.from('kategori').insert([{ nama_kategori: document.getElementById('namaKategoriBaru').value }]);
@@ -373,7 +319,7 @@
             if (error) showToast('Gagal!', 'error'); else { showToast('Kategori ditambah!', 'success'); document.getElementById('formTambahKategori').reset(); tutupModal('modalKategori'); muatDataDariSupabase(); }
         }
 
-        // 5. VISUAL & TABEL
+        // 5. VISUAL & TABEL (UPDATE: KOLOM LOKASI DIPISAH)
         function gantiTab(tab) {
             tabAktif = tab;
             document.getElementById('btnTabStok').className = tab === 'stok' ? "pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition" : "pb-3 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent transition";
@@ -383,7 +329,7 @@
 
         function formatTanggalPendek(waktuIso) {
             if (!waktuIso) return '-'; const d = new Date(waktuIso);
-            return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}) + ' <span class="text-[11px] text-slate-400 ml-1">' + d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) + '</span>';
+            return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}) + ' <br><span class="text-[11px] text-slate-400">' + d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) + '</span>';
         }
 
         function renderTables() {
@@ -397,7 +343,8 @@
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
                             <td class="py-3.5 px-5 font-mono font-medium">${item.id}</td>
-                            <td class="py-3.5 px-5"><div class="font-semibold">${item.name}</div><div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ${item.lokasi}</div></td>
+                            <td class="py-3.5 px-5 font-semibold">${item.name}</td>
+                            <td class="py-3.5 px-5 text-[13px] font-medium text-slate-500 dark:text-slate-400"><i class="fa-solid fa-location-dot text-rose-500 mr-1.5"></i>${item.lokasi}</td>
                             <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">${item.category}</span></td>
                             <td class="py-3.5 px-5 text-right font-bold"><span class="${isLow ? 'text-rose-600' : ''}">${formatNumber(item.stock)}</span> <span class="text-xs font-normal text-slate-400 ml-1">${item.unit}</span></td>
                             <td class="py-3.5 px-5 text-center">${isLow ? '<span class="px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">Menipis</span>' : '<span class="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Aman</span>'}</td>
@@ -405,17 +352,20 @@
                 });
             } else {
                 const tbody = document.getElementById('riwayatTableBody'); tbody.innerHTML = '';
-                const filteredRiwayat = riwayatData.filter(r => (r.nama_item.toLowerCase().includes(search) || (r.lokasi && r.lokasi.toLowerCase().includes(search))) && (filter === 'ALL' || r.nama_item.includes(`(${filter})`)));
+                const filteredRiwayat = riwayatData.filter(r => (r.nama_item.toLowerCase().includes(search) || (r.lokasi && r.lokasi.toLowerCase().includes(search)) || (r.catatan && r.catatan.toLowerCase().includes(search))) && (filter === 'ALL' || r.nama_item.includes(`(${filter})`)));
                 barisDitemukan = filteredRiwayat.length;
                 filteredRiwayat.forEach(r => {
                     const isMasuk = r.tipe === 'Masuk';
-                    // Tombol Edit hanya muncul jika User = Admin
                     const actionBtn = userRole === 'admin' ? `<button onclick="pemicuEditTransaksi(${r.id})" class="px-2.5 py-1.5 bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-600 dark:bg-slate-800 dark:hover:bg-amber-900/40 rounded-lg text-xs font-semibold transition shadow-sm border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-pen-to-square"></i></button>` : `<span class="text-slate-300 dark:text-slate-600">-</span>`;
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
                             <td class="py-3.5 px-5 text-slate-600 dark:text-slate-300 font-medium text-[13px]">${formatTanggalPendek(r.created_at)}</td>
-                            <td class="py-3.5 px-5"><div class="font-semibold text-slate-700 dark:text-slate-200">${r.nama_item}</div><div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ${r.lokasi || '-'} ${r.catatan ? `<span class="ml-2 italic opacity-80 text-blue-500">"${r.catatan}"</span>` : ''}</div></td>
+                            <td class="py-3.5 px-5 font-semibold text-slate-700 dark:text-slate-200">${r.nama_item}</td>
+                            <td class="py-3.5 px-5 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                                <div class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-500"></i> ${r.lokasi || '-'}</div>
+                                ${r.catatan ? `<div class="mt-1 text-[11px] italic opacity-80 text-blue-500"><i class="fa-solid fa-note-sticky mr-1"></i> "${r.catatan}"</div>` : ''}
+                            </td>
                             <td class="py-3.5 px-5">${isMasuk ? '<span class="text-emerald-600 dark:text-emerald-400 font-semibold"><i class="fa-solid fa-arrow-down-long mr-1"></i> Masuk</span>' : '<span class="text-rose-600 dark:text-rose-400 font-semibold"><i class="fa-solid fa-arrow-up-long mr-1"></i> Keluar</span>'}</td>
                             <td class="py-3.5 px-5 text-right font-bold">${formatNumber(r.jumlah)}</td>
                             <td class="py-3.5 px-5 text-center">${actionBtn}</td>
@@ -425,7 +375,7 @@
             document.getElementById('emptyState').classList.toggle('hidden', barisDitemukan > 0);
         }
 
-        // 6. HELPER UMUM
+        // 6. HELPER
         function setWaktuSekarang() { const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); document.getElementById('inputTanggal').value = now.toISOString().slice(0,16); }
         function bukaModal(id) { const m = document.getElementById(id); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10); if(id === 'modalTransaksi') setWaktuSekarang(); }
         function tutupModal(id) { const m = document.getElementById(id); m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300); }
