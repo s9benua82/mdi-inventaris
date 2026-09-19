@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="id" class="light">
-<head>
+<!-- 
+	Daftar Update
+        /* Memasukkan fitur login admin dan operator */
+	/* Bukan admin atau operator hanya bisa melihat transaksi harian dan stok */
+        /* Menghilangkan kotak input di samping, dan membuatnya menjadi jendela pop up */
+        /* Membuat tab transaksi harian sehingga ada pemisahan antara stok terkini dan transaksi harian */
+	- [18/09/2026] Menambahkan Tab Lokasi, Fitur Lupa/Reset Password, Penambahan kalender pada jendela popup transaksi
+	- [19/09/2026] Menambahkan Fitur Edit di tab Transaksi, Edit yang di lakukan harus memasukkan PIN/Password
 
+-->
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MDI - Dashboard Inventaris (Pro UI v2)</title>
+    <title>MDI - Dashboard Inventaris (Pro UI v3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,7 +30,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 pb-10">
 
     <!-- TOAST NOTIFICATION -->
@@ -28,23 +37,14 @@
         <i id="toastIcon" class="text-lg"></i><span id="toastMsg" class="text-sm font-medium"></span>
     </div>
 
-    <!-- MODAL LOGIN DENGAN LUPA PASSWORD -->
+    <!-- MODAL LOGIN -->
     <div id="modalLogin" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-right-to-bracket text-blue-500 mr-2"></i>Login Sistem</h3>
-                <button onclick="tutupModal('modalLogin')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-right-to-bracket text-blue-500 mr-2"></i>Login Sistem</h3><button onclick="tutupModal('modalLogin')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div>
             <form id="formLogin" onsubmit="handleLogin(event)" class="p-6 space-y-4">
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Email Akses</label><input type="email" id="loginEmail" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Email Akses</label>
-                    <input type="email" id="loginEmail" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
-                </div>
-                <div>
-                    <div class="flex justify-between items-center mb-1.5">
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">Password</label>
-                        <button type="button" onclick="handleResetPassword()" class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline">Lupa Password?</button>
-                    </div>
+                    <div class="flex justify-between items-center mb-1.5"><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">Password</label><button type="button" onclick="handleResetPassword()" class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline">Lupa Password?</button></div>
                     <input type="password" id="loginPassword" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
                 </div>
                 <button type="submit" id="btnSubmitLogin" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm mt-2">Masuk</button>
@@ -52,110 +52,79 @@
         </div>
     </div>
 
-    <!-- MODAL TRANSAKSI (DENGAN TANGGAL & LOKASI) -->
+    <!-- MODAL VERIFIKASI KEAMANAN (BARU) -->
+    <div id="modalVerifikasi" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-rose-600 dark:text-rose-500"><i class="fa-solid fa-shield-halved mr-2"></i>Verifikasi Keamanan</h3><button onclick="tutupModal('modalVerifikasi')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+            <form onsubmit="prosesVerifikasi(event)" class="p-6 space-y-4">
+                <p class="text-xs text-slate-500 dark:text-slate-400">Tindakan ini memerlukan otentikasi. Silakan masukkan kembali <b>password login</b> Anda.</p>
+                <div><input type="password" id="verifyPassword" required placeholder="Masukkan password Anda..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none focus:ring-2 focus:ring-rose-500"></div>
+                <button type="submit" id="btnVerify" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-sm shadow-md">Verifikasi & Lanjutkan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL TRANSAKSI BARU -->
     <div id="modalTransaksi" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i>Catat Transaksi Stok</h3>
-                <button onclick="tutupModal('modalTransaksi')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <form id="stockForm" onsubmit="handleStockUpdate(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <!-- Waktu & Tanggal -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Waktu Transaksi</label>
-                    <input type="datetime-local" id="inputTanggal" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none font-mono">
-                </div>
-                
-                <!-- Pilih Item -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pilih Item *</label>
-                    <select id="selectItem" required onchange="handleItemSelectChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"><option value="" disabled selected>-- Memuat Data... --</option></select>
-                </div>
-                <div id="itemInfoCard" class="hidden p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 text-xs flex justify-between text-blue-800 dark:text-blue-300">
-                    <span>Kat: <b id="infoCategory">-</b></span><span>Sisa Stok: <b id="infoCurrentStock">-</b></span>
-                </div>
-
-                <!-- Lokasi -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi / Ruangan Saat Ini</label>
-                    <input type="text" id="inputLokasi" placeholder="Contoh: Gudang 1" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
-                </div>
-
-                <!-- Tipe Mutasi -->
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i>Catat Transaksi Stok</h3><button onclick="tutupModal('modalTransaksi')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+            <form id="stockForm" onsubmit="handleStockUpdate(event)" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Waktu Transaksi</label><input type="datetime-local" id="inputTanggal" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none font-mono"></div>
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pilih Item *</label><select id="selectItem" required onchange="handleItemSelectChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"><option value="" disabled selected>-- Memuat Data... --</option></select></div>
+                <div id="itemInfoCard" class="hidden p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 text-xs flex justify-between text-blue-800 dark:text-blue-300"><span>Kat: <b id="infoCategory">-</b></span><span>Sisa: <b id="infoCurrentStock">-</b></span></div>
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi / Ruangan Saat Ini</label><input type="text" id="inputLokasi" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Tipe Mutasi *</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 dark:has-[:checked]:bg-emerald-900/30 has-[:checked]:text-emerald-700 dark:has-[:checked]:text-emerald-400 text-sm font-medium"><input type="radio" name="mutationType" value="Masuk" checked class="hidden"><i class="fa-solid fa-arrow-down-long text-emerald-600"></i> Masuk (+)</label>
-                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 cursor-pointer has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-900/30 has-[:checked]:text-rose-700 dark:has-[:checked]:text-rose-400 text-sm font-medium"><input type="radio" name="mutationType" value="Keluar" class="hidden"><i class="fa-solid fa-arrow-up-long text-rose-600"></i> Keluar (-)</label>
+                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 dark:has-[:checked]:bg-emerald-900/30 has-[:checked]:text-emerald-700 dark:has-[:checked]:text-emerald-400 text-sm font-medium"><input type="radio" name="mutationType" value="Masuk" checked class="hidden"><i class="fa-solid fa-arrow-down-long text-emerald-600"></i> Masuk</label>
+                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 cursor-pointer has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-900/30 has-[:checked]:text-rose-700 dark:has-[:checked]:text-rose-400 text-sm font-medium"><input type="radio" name="mutationType" value="Keluar" class="hidden"><i class="fa-solid fa-arrow-up-long text-rose-600"></i> Keluar</label>
                     </div>
                 </div>
-                
-                <!-- Jumlah -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Jumlah *</label>
-                    <div class="relative">
-                        <input type="number" id="inputQty" required min="1" step="any" placeholder="0" class="w-full pl-3.5 pr-14 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
-                        <span id="inputUnitBadge" class="absolute right-3 top-2.5 text-xs text-slate-400 font-semibold uppercase">Unit</span>
-                    </div>
-                </div>
-                
-                <!-- Catatan -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Catatan / Referensi</label>
-                    <input type="text" id="inputNotes" placeholder="Opsional (Contoh: DO-0912)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
-                </div>
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Jumlah *</label><div class="relative"><input type="number" id="inputQty" required min="1" step="any" placeholder="0" class="w-full pl-3.5 pr-14 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"><span id="inputUnitBadge" class="absolute right-3 top-2.5 text-xs text-slate-400 font-semibold uppercase">Unit</span></div></div>
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Catatan / Referensi</label><input type="text" id="inputNotes" placeholder="Opsional (Contoh: DO-0912)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
                 <button type="submit" id="btnSubmitTrans" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm mt-2 shadow-md">Simpan Transaksi</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL TAMBAH BARANG (DENGAN LOKASI) -->
-    <div id="modalBarang" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+    <!-- MODAL EDIT TRANSAKSI (BARU) -->
+    <div id="modalEditTransaksi" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-box-open text-indigo-500 mr-2"></i>Daftarkan Item Baru</h3>
-                <button onclick="tutupModal('modalBarang')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <form id="formTambahBarang" onsubmit="handleTambahBarang(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Item Lengkap</label><input type="text" id="newName" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
-                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kategori Item</label><select id="newCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></select></div>
-                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi / Ruangan</label><input type="text" id="newLokasi" placeholder="Contoh: Gudang Belakang / Ruang Meeting" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Satuan</label><input type="text" id="newUnit" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
-                    <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Batas Min</label><input type="number" id="newMin" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-pen-to-square text-amber-500 mr-2"></i>Edit Transaksi</h3><button onclick="tutupModal('modalEditTransaksi')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div>
+            <form onsubmit="simpanEditTransaksi(event)" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                <input type="hidden" id="editTransId">
+                <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300" id="editItemName">Nama Item</div>
+                
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Waktu Transaksi</label><input type="datetime-local" id="editTanggal" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none font-mono"></div>
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi / Ruangan Saat Ini</label><input type="text" id="editLokasi" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Tipe Mutasi *</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 cursor-pointer has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 dark:has-[:checked]:bg-emerald-900/30 has-[:checked]:text-emerald-700 dark:has-[:checked]:text-emerald-400 text-sm font-medium"><input type="radio" name="editMutationType" value="Masuk" id="editMutMasuk" class="hidden"><i class="fa-solid fa-arrow-down-long text-emerald-600"></i> Masuk</label>
+                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 cursor-pointer has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-900/30 has-[:checked]:text-rose-700 dark:has-[:checked]:text-rose-400 text-sm font-medium"><input type="radio" name="editMutationType" value="Keluar" id="editMutKeluar" class="hidden"><i class="fa-solid fa-arrow-up-long text-rose-600"></i> Keluar</label>
+                    </div>
                 </div>
-                <button type="submit" id="btnSubmitBaru" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm">Simpan Master Data</button>
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Jumlah *</label><input type="number" id="editQty" required min="1" step="any" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
+                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Catatan / Referensi</label><input type="text" id="editNotes" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
+                <button type="submit" id="btnSubmitEdit" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl text-sm mt-2 shadow-md">Simpan Perubahan</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL TAMBAH KATEGORI (Tidak diubah, tetap sama) -->
-    <div id="modalKategori" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-tags text-purple-500 mr-2"></i>Tambah Kategori</h3><button onclick="tutupModal('modalKategori')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div>
-            <form id="formTambahKategori" onsubmit="handleTambahKategori(event)" class="p-6 space-y-4">
-                <div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Kategori Baru</label><input type="text" id="namaKategoriBaru" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
-                <button type="submit" id="btnSubmitKat" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-sm">Simpan Kategori</button>
-            </form>
-        </div>
-    </div>
+    <!-- MODAL TAMBAH BARANG & KATEGORI (Tetap Sama) -->
+    <div id="modalBarang" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300"><div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-box-open text-indigo-500 mr-2"></i>Daftarkan Item Baru</h3><button onclick="tutupModal('modalBarang')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div><form id="formTambahBarang" onsubmit="handleTambahBarang(event)" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto"><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Item Lengkap</label><input type="text" id="newName" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kategori Item</label><select id="newCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></select></div><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi / Ruangan</label><input type="text" id="newLokasi" placeholder="Contoh: Gudang Belakang" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Satuan</label><input type="text" id="newUnit" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Batas Min</label><input type="number" id="newMin" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div></div><button type="submit" id="btnSubmitBaru" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm">Simpan Master Data</button></form></div></div>
+    <div id="modalKategori" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300"><div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-tags text-purple-500 mr-2"></i>Tambah Kategori</h3><button onclick="tutupModal('modalKategori')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button></div><form id="formTambahKategori" onsubmit="handleTambahKategori(event)" class="p-6 space-y-4"><div><label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Kategori Baru</label><input type="text" id="namaKategoriBaru" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div><button type="submit" id="btnSubmitKat" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-sm">Simpan Kategori</button></form></div></div>
 
     <!-- CONTAINER UTAMA -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800">
-            <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-500 text-white flex items-center justify-center font-black text-lg shadow-md shrink-0">MDI</div>
-                <div><h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white"><span class="text-blue-600">MDI</span> Inventaris</h1><p class="text-xs sm:text-sm text-slate-500">Sistem monitoring stok Cloud Security</p></div>
-            </div>
+            <div class="flex items-center gap-3.5"><div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-500 text-white flex items-center justify-center font-black text-lg shadow-md shrink-0">MDI</div><div><h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white"><span class="text-blue-600">MDI</span> Inventaris</h1><p class="text-xs sm:text-sm text-slate-500">Sistem monitoring stok Cloud Security</p></div></div>
             <div class="flex items-center gap-3 self-end md:self-auto">
                 <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition"><i id="themeIcon" class="fa-solid fa-moon"></i></button>
                 <button id="btnLoginHeader" onclick="bukaModal('modalLogin')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 font-semibold rounded-xl text-sm transition"><i class="fa-solid fa-user-lock mr-1.5"></i> Login</button>
-                <div id="userInfoHeader" class="hidden flex items-center gap-3 bg-slate-100 dark:bg-slate-800 pl-3 pr-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <div class="text-right hidden sm:block"><p id="userNameDisplay" class="text-xs font-bold text-slate-700 dark:text-slate-200">Email</p><p id="roleDisplay" class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">ROLE</p></div>
-                    <button onclick="handleLogout()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/50 transition" title="Logout"><i class="fa-solid fa-power-off"></i></button>
-                </div>
+                <div id="userInfoHeader" class="hidden flex items-center gap-3 bg-slate-100 dark:bg-slate-800 pl-3 pr-2 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700"><div class="text-right hidden sm:block"><p id="userNameDisplay" class="text-xs font-bold text-slate-700 dark:text-slate-200">Email</p><p id="roleDisplay" class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">ROLE</p></div><button onclick="handleLogout()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-700 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/50 transition" title="Logout"><i class="fa-solid fa-power-off"></i></button></div>
             </div>
         </header>
 
@@ -167,22 +136,15 @@
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border shadow-sm flex items-center gap-4"><div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div><div><p class="text-xs font-semibold text-slate-500">STOK MENIPIS</p><h3 id="statLowStock" class="text-2xl font-bold text-amber-600 mt-0.5">0 Item</h3></div></div>
         </section>
 
-        <!-- KONTEN TABEL (FULL WIDTH) -->
+        <!-- KONTEN TABEL -->
         <section class="w-full bg-white dark:bg-slate-900 rounded-2xl border shadow-sm overflow-hidden">
-            
-            <!-- MENU TAB & ALAT -->
             <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800">
                 <div class="flex gap-6 border-b border-slate-200 dark:border-slate-800 mb-5">
                     <button id="btnTabStok" onclick="gantiTab('stok')" class="pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition">Stok Saat Ini</button>
                     <button id="btnTabRiwayat" onclick="gantiTab('riwayat')" class="pb-3 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent transition">Riwayat Transaksi</button>
                 </div>
-
                 <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
-                    <div class="relative w-full sm:w-64">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="searchInput" oninput="renderTables()" placeholder="Cari item, kategori, atau lokasi..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border bg-slate-50 dark:bg-slate-800 text-sm outline-none">
-                    </div>
-                    
+                    <div class="relative w-full sm:w-64"><i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-sm"></i><input type="text" id="searchInput" oninput="renderTables()" placeholder="Cari item, kategori, atau lokasi..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border bg-slate-50 dark:bg-slate-800 text-sm outline-none"></div>
                     <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         <select id="filterCategory" onchange="renderTables()" class="px-3 py-2 rounded-xl border bg-slate-50 dark:bg-slate-800 text-sm outline-none shrink-0"><option value="ALL">Semua Kategori</option></select>
                         <button id="btnTambahKategori" onclick="bukaModal('modalKategori')" class="hidden px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/40 dark:text-purple-300 text-sm font-semibold rounded-xl transition"><i class="fa-solid fa-folder-plus"></i> <span class="hidden sm:inline">Kategori</span></button>
@@ -192,51 +154,27 @@
                 </div>
             </div>
 
-            <!-- ISI TAB 1: TABEL STOK -->
+            <!-- ISI TAB 1: STOK -->
             <div id="tabStok" class="tab-content active overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[700px]">
-                    <thead>
-                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                            <th class="py-4 px-5 w-32">ID Barang</th>
-                            <th class="py-4 px-5">Nama & Lokasi</th>
-                            <th class="py-4 px-5">Kategori</th>
-                            <th class="py-4 px-5 text-right">Sisa Stok</th>
-                            <th class="py-4 px-5 text-center">Status</th>
-                        </tr>
-                    </thead>
+                    <thead><tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800"><th class="py-4 px-5 w-32">ID Barang</th><th class="py-4 px-5">Nama & Lokasi</th><th class="py-4 px-5">Kategori</th><th class="py-4 px-5 text-right">Sisa Stok</th><th class="py-4 px-5 text-center">Status</th></tr></thead>
                     <tbody id="inventoryTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
                 </table>
             </div>
 
-            <!-- ISI TAB 2: TABEL RIWAYAT TRANSAKSI -->
+            <!-- ISI TAB 2: RIWAYAT -->
             <div id="tabRiwayat" class="tab-content overflow-x-auto">
                 <table class="w-full text-left border-collapse min-w-[700px]">
-                    <thead>
-                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                            <th class="py-4 px-5">Waktu & Tanggal</th>
-                            <th class="py-4 px-5">Nama Item & Lokasi</th>
-                            <th class="py-4 px-5">Mutasi</th>
-                            <th class="py-4 px-5 text-right">Jumlah</th>
-                        </tr>
-                    </thead>
+                    <thead><tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800"><th class="py-4 px-5">Waktu & Tanggal</th><th class="py-4 px-5">Nama Item & Lokasi</th><th class="py-4 px-5">Mutasi</th><th class="py-4 px-5 text-right">Jumlah</th><th class="py-4 px-5 text-center">Aksi</th></tr></thead>
                     <tbody id="riwayatTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
                 </table>
             </div>
 
-            <!-- EMPTY STATE & FOOTER -->
-            <div id="emptyState" class="hidden p-10 text-center">
-                <i class="fa-solid fa-box-open text-5xl text-slate-200 dark:text-slate-700 mb-3"></i>
-                <p class="text-slate-500 text-sm font-medium">Tidak ada data ditemukan.</p>
-            </div>
-            
-            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row justify-between items-center gap-2">
-                <span id="authStatusBadge"><i class="fa-solid fa-globe text-emerald-500 mr-1"></i> Mode Tamu (Hanya Lihat)</span>
-                <span id="recordCountInfo">Menyinkronkan data...</span>
-            </div>
+            <div id="emptyState" class="hidden p-10 text-center"><i class="fa-solid fa-box-open text-5xl text-slate-200 dark:text-slate-700 mb-3"></i><p class="text-slate-500 text-sm font-medium">Tidak ada data ditemukan.</p></div>
+            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 flex flex-col sm:flex-row justify-between items-center gap-2"><span id="authStatusBadge"><i class="fa-solid fa-globe text-emerald-500 mr-1"></i> Mode Tamu (Hanya Lihat)</span><span id="recordCountInfo">Menyinkronkan data...</span></div>
         </section>
     </div>
 
-    <!-- LOGIKA JAVASCRIPT & SUPABASE -->
     <script>
         // ==========================================
         // MASUKKAN KREDENSIAL SUPABASE ANDA DI SINI
@@ -250,149 +188,166 @@
 
         let inventoryData = []; let riwayatData = []; let daftarKategori = [];
         let currentUser = null; let userRole = 'viewer'; let tabAktif = 'stok';
+        let idTransaksiYangMauDiedit = null; // Menyimpan ID transaksi untuk diedit
 
-        // 1. SISTEM OTENTIKASI & HAK AKSES
+        // 1. OTENTIKASI
         async function cekSesiAktif() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) { currentUser = session.user; await cekJabatanUser(currentUser.email); } 
             else { currentUser = null; userRole = 'viewer'; terapkanHakAkses(); }
         }
-
         async function cekJabatanUser(email) {
-            try {
-                let { data, error } = await supabaseClient.from('user_roles').select('role').eq('email', email).single();
-                if (error) throw error; userRole = data.role.toLowerCase() || 'viewer';
-            } catch (error) { userRole = 'operator'; }
-            terapkanHakAkses();
+            try { let { data, error } = await supabaseClient.from('user_roles').select('role').eq('email', email).single(); userRole = data.role.toLowerCase() || 'viewer'; } 
+            catch (error) { userRole = 'operator'; } terapkanHakAkses();
         }
-
         function terapkanHakAkses() {
             const btnLogin = document.getElementById('btnLoginHeader'); const userInfo = document.getElementById('userInfoHeader');
             const btnKat = document.getElementById('btnTambahKategori'); const btnItem = document.getElementById('btnTambahItem'); const btnTrans = document.getElementById('btnCatatTransaksi');
             const statusBadge = document.getElementById('authStatusBadge');
-
             if (currentUser) {
-                btnLogin.classList.add('hidden'); userInfo.classList.remove('hidden');
-                document.getElementById('userNameDisplay').textContent = currentUser.email.split('@')[0];
-                document.getElementById('roleDisplay').textContent = userRole;
-                
-                if (userRole === 'admin') {
-                    btnKat.classList.remove('hidden'); btnItem.classList.remove('hidden'); btnTrans.classList.remove('hidden');
-                    statusBadge.innerHTML = `<i class="fa-solid fa-shield-halved text-blue-500 mr-1"></i> Mode Admin Aktif`;
-                } else {
-                    btnKat.classList.add('hidden'); btnItem.classList.add('hidden'); btnTrans.classList.remove('hidden');
-                    statusBadge.innerHTML = `<i class="fa-solid fa-user-check text-blue-500 mr-1"></i> Mode Operator Aktif`;
-                }
+                btnLogin.classList.add('hidden'); userInfo.classList.remove('hidden'); document.getElementById('userNameDisplay').textContent = currentUser.email.split('@')[0]; document.getElementById('roleDisplay').textContent = userRole;
+                if (userRole === 'admin') { btnKat.classList.remove('hidden'); btnItem.classList.remove('hidden'); btnTrans.classList.remove('hidden'); statusBadge.innerHTML = `<i class="fa-solid fa-shield-halved text-blue-500 mr-1"></i> Mode Admin Aktif`; } 
+                else { btnKat.classList.add('hidden'); btnItem.classList.add('hidden'); btnTrans.classList.remove('hidden'); statusBadge.innerHTML = `<i class="fa-solid fa-user-check text-blue-500 mr-1"></i> Mode Operator Aktif`; }
             } else {
-                btnLogin.classList.remove('hidden'); userInfo.classList.add('hidden');
-                btnKat.classList.add('hidden'); btnItem.classList.add('hidden'); btnTrans.classList.add('hidden');
-                statusBadge.innerHTML = `<i class="fa-solid fa-globe text-emerald-500 mr-1"></i> Mode Tamu (Hanya Lihat)`;
+                btnLogin.classList.remove('hidden'); userInfo.classList.add('hidden'); btnKat.classList.add('hidden'); btnItem.classList.add('hidden'); btnTrans.classList.add('hidden'); statusBadge.innerHTML = `<i class="fa-solid fa-globe text-emerald-500 mr-1"></i> Mode Tamu (Hanya Lihat)`;
             }
+            renderTables(); // Re-render table to show/hide edit buttons based on role
         }
 
         async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmitLogin'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            e.preventDefault(); const btn = document.getElementById('btnSubmitLogin'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
             const { error } = await supabaseClient.auth.signInWithPassword({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value });
             btn.innerHTML = 'Masuk'; btn.disabled = false;
             if (error) showToast("Login gagal!", "error"); else { showToast("Berhasil login!", "success"); tutupModal('modalLogin'); document.getElementById('formLogin').reset(); cekSesiAktif(); }
         }
-
         async function handleResetPassword() {
-            const email = document.getElementById('loginEmail').value;
-            if (!email) return showToast("Masukkan email Anda di kolom atas terlebih dahulu!", "error");
-            
+            const email = document.getElementById('loginEmail').value; if (!email) return showToast("Masukkan email Anda di atas!", "error");
             const btn = document.getElementById('btnSubmitLogin'); btn.disabled = true;
-            // Gunakan fitur bawaan Supabase untuk reset password
             const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
             btn.disabled = false;
-            
-            if (error) showToast("Gagal: " + error.message, "error");
-            else showToast("Link reset password telah dikirim ke email Anda!", "success");
+            if (error) showToast("Gagal: " + error.message, "error"); else showToast("Link reset dikirim ke email!", "success");
         }
-
         async function handleLogout() { await supabaseClient.auth.signOut(); showToast("Berhasil keluar.", "info"); cekSesiAktif(); }
 
-        // 2. AMBIL & OLAH DATA DARI SUPABASE
+        // 2. DATA
         async function muatDataDariSupabase() {
             document.getElementById('recordCountInfo').textContent = 'Mengambil data server...';
             try {
-                let { data: katData } = await supabaseClient.from('kategori').select('*');
-                daftarKategori = katData ? katData.map(k => k.nama_kategori) : [];
-
+                let { data: katData } = await supabaseClient.from('kategori').select('*'); daftarKategori = katData ? katData.map(k => k.nama_kategori) : [];
                 let { data: masterData } = await supabaseClient.from('master_barang').select('*');
                 let { data: transData } = await supabaseClient.from('transaksi').select('*').order('created_at', { ascending: false });
                 riwayatData = transData || []; 
 
                 inventoryData = (masterData || []).map(item => {
                     let totalStok = 0; let namaCari = `[${item.id}] ${item.nama_item} (${item.kategori})`;
-                    riwayatData.forEach(t => {
-                        if (t.nama_item === namaCari) {
-                            let qty = parseFloat(t.jumlah) || 0;
-                            if (t.tipe === 'Masuk') totalStok += qty; else if (t.tipe === 'Keluar') totalStok -= qty;
-                        }
-                    });
+                    riwayatData.forEach(t => { if (t.nama_item === namaCari) { let qty = parseFloat(t.jumlah) || 0; if (t.tipe === 'Masuk') totalStok += qty; else if (t.tipe === 'Keluar') totalStok -= qty; } });
                     return { id: item.id, name: item.nama_item, category: item.kategori, unit: item.satuan, minStock: parseFloat(item.batas_min) || 0, stock: totalStok, lokasi: item.lokasi || '-' };
                 });
-
-                populateSelectOptions(); populateCategoryDropdowns(); renderTables(); updateStats();
-                document.getElementById('recordCountInfo').textContent = `Sinkronisasi Selesai.`;
+                populateSelectOptions(); populateCategoryDropdowns(); renderTables(); updateStats(); document.getElementById('recordCountInfo').textContent = `Sinkronisasi Selesai.`;
             } catch (error) { console.error(error); }
         }
 
-        // 3. FUNGSI TRANSAKSI & MASTER DATA
+        // 3. EDIT TRANSAKSI (STEP-UP AUTH)
+        function pemicuEditTransaksi(idTrans) {
+            idTransaksiYangMauDiedit = idTrans;
+            document.getElementById('verifyPassword').value = '';
+            bukaModal('modalVerifikasi'); // Minta password dulu
+        }
+
+        async function prosesVerifikasi(e) {
+            e.preventDefault();
+            const pass = document.getElementById('verifyPassword').value;
+            const btn = document.getElementById('btnVerify'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            
+            // Cek password menggunakan sistem Auth Supabase
+            const { error } = await supabaseClient.auth.signInWithPassword({ email: currentUser.email, password: pass });
+            
+            btn.innerHTML = 'Verifikasi & Lanjutkan'; btn.disabled = false;
+            
+            if (error) {
+                showToast("Password salah! Verifikasi ditolak.", "error");
+            } else {
+                tutupModal('modalVerifikasi');
+                bukaFormEditSebenarnya(idTransaksiYangMauDiedit);
+            }
+        }
+
+        function bukaFormEditSebenarnya(id) {
+            const dataRow = riwayatData.find(r => r.id === id);
+            if(!dataRow) return showToast("Data tidak ditemukan", "error");
+
+            document.getElementById('editTransId').value = dataRow.id;
+            document.getElementById('editItemName').textContent = dataRow.nama_item;
+            document.getElementById('editLokasi').value = dataRow.lokasi || '';
+            document.getElementById('editQty').value = dataRow.jumlah;
+            document.getElementById('editNotes').value = dataRow.catatan || '';
+            
+            // Format format datetime-local (YYYY-MM-DDTHH:MM)
+            const d = new Date(dataRow.created_at); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            document.getElementById('editTanggal').value = d.toISOString().slice(0,16);
+
+            if(dataRow.tipe === 'Masuk') document.getElementById('editMutMasuk').checked = true;
+            else document.getElementById('editMutKeluar').checked = true;
+
+            bukaModal('modalEditTransaksi');
+        }
+
+        async function simpanEditTransaksi(e) {
+            e.preventDefault();
+            const id = document.getElementById('editTransId').value;
+            const tgl = new Date(document.getElementById('editTanggal').value).toISOString();
+            const lok = document.getElementById('editLokasi').value;
+            const mutasi = document.querySelector('input[name="editMutationType"]:checked').value;
+            const qty = parseFloat(document.getElementById('editQty').value);
+            const notes = document.getElementById('editNotes').value;
+
+            const btn = document.getElementById('btnSubmitEdit'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            
+            // Update tabel transaksi
+            const { error } = await supabaseClient.from('transaksi').update({
+                created_at: tgl, lokasi: lok, tipe: mutasi, kategori: mutasi, jumlah: qty, catatan: notes
+            }).eq('id', id);
+
+            btn.innerHTML = old; btn.disabled = false;
+            if (error) showToast("Gagal mengedit: " + error.message, "error");
+            else { showToast("Transaksi berhasil diubah!", "success"); tutupModal('modalEditTransaksi'); muatDataDariSupabase(); }
+        }
+
+        // 4. TRANSAKSI BARU & MASTER DATA
         async function handleStockUpdate(e) {
             e.preventDefault();
-            const selectEl = document.getElementById('selectItem'); const itemName = selectEl.options[selectEl.selectedIndex].text;
+            const itemName = document.getElementById('selectItem').options[document.getElementById('selectItem').selectedIndex].text;
             const mutasi = document.querySelector('input[name="mutationType"]:checked').value;
-            const qty = parseFloat(document.getElementById('inputQty').value);
-            const notes = document.getElementById('inputNotes').value;
-            
-            // Ambil Waktu & Lokasi
-            const tglInput = document.getElementById('inputTanggal').value;
-            const formattedDate = new Date(tglInput).toISOString();
-            const lokasi = document.getElementById('inputLokasi').value;
+            const qty = parseFloat(document.getElementById('inputQty').value); const notes = document.getElementById('inputNotes').value;
+            const lok = document.getElementById('inputLokasi').value; const tgl = new Date(document.getElementById('inputTanggal').value).toISOString();
 
             const btn = document.getElementById('btnSubmitTrans'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            
-            // Masukkan data ke Supabase (termasuk menimpa created_at dengan waktu dari input form)
-            const { error } = await supabaseClient.from('transaksi').insert([{ 
-                nama_item: itemName, kategori: mutasi, jumlah: qty, tipe: mutasi, lokasi: lokasi, created_at: formattedDate 
-            }]);
-            
+            const { error } = await supabaseClient.from('transaksi').insert([{ nama_item: itemName, kategori: mutasi, jumlah: qty, tipe: mutasi, lokasi: lok, created_at: tgl, catatan: notes }]);
             btn.innerHTML = old; btn.disabled = false;
             if (error) showToast('Gagal: ' + error.message, 'error'); else { showToast('Transaksi dicatat!', 'success'); document.getElementById('stockForm').reset(); tutupModal('modalTransaksi'); muatDataDariSupabase(); }
         }
 
         async function handleTambahBarang(e) {
-            e.preventDefault();
-            const idBarang = "MDI-" + Math.floor(1000 + Math.random() * 9000);
+            e.preventDefault(); const idBarang = "MDI-" + Math.floor(1000 + Math.random() * 9000);
             const btn = document.getElementById('btnSubmitBaru'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
-            
-            const { error } = await supabaseClient.from('master_barang').insert([{ 
-                id: idBarang, nama_item: document.getElementById('newName').value, kategori: document.getElementById('newCategory').value, 
-                satuan: document.getElementById('newUnit').value, batas_min: parseFloat(document.getElementById('newMin').value), lokasi: document.getElementById('newLokasi').value 
-            }]);
-            
+            const { error } = await supabaseClient.from('master_barang').insert([{ id: idBarang, nama_item: document.getElementById('newName').value, kategori: document.getElementById('newCategory').value, satuan: document.getElementById('newUnit').value, batas_min: parseFloat(document.getElementById('newMin').value), lokasi: document.getElementById('newLokasi').value }]);
             btn.innerHTML = old; btn.disabled = false;
             if (error) showToast('Gagal!', 'error'); else { showToast('Item ditambah!', 'success'); document.getElementById('formTambahBarang').reset(); tutupModal('modalBarang'); muatDataDariSupabase(); }
         }
 
         async function handleTambahKategori(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmitKat'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
+            e.preventDefault(); const btn = document.getElementById('btnSubmitKat'); const old = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; btn.disabled = true;
             const { error } = await supabaseClient.from('kategori').insert([{ nama_kategori: document.getElementById('namaKategoriBaru').value }]);
             btn.innerHTML = old; btn.disabled = false;
             if (error) showToast('Gagal!', 'error'); else { showToast('Kategori ditambah!', 'success'); document.getElementById('formTambahKategori').reset(); tutupModal('modalKategori'); muatDataDariSupabase(); }
         }
 
-        // 4. LOGIKA VISUAL & TABEL
+        // 5. VISUAL & TABEL
         function gantiTab(tab) {
             tabAktif = tab;
             document.getElementById('btnTabStok').className = tab === 'stok' ? "pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition" : "pb-3 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent transition";
             document.getElementById('btnTabRiwayat').className = tab === 'riwayat' ? "pb-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition" : "pb-3 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent transition";
-            document.getElementById('tabStok').classList.toggle('active', tab === 'stok'); document.getElementById('tabRiwayat').classList.toggle('active', tab === 'riwayat');
-            renderTables();
+            document.getElementById('tabStok').classList.toggle('active', tab === 'stok'); document.getElementById('tabRiwayat').classList.toggle('active', tab === 'riwayat'); renderTables();
         }
 
         function formatTanggalPendek(waktuIso) {
@@ -411,10 +366,7 @@
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
                             <td class="py-3.5 px-5 font-mono font-medium">${item.id}</td>
-                            <td class="py-3.5 px-5">
-                                <div class="font-semibold">${item.name}</div>
-                                <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ${item.lokasi}</div>
-                            </td>
+                            <td class="py-3.5 px-5"><div class="font-semibold">${item.name}</div><div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ${item.lokasi}</div></td>
                             <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">${item.category}</span></td>
                             <td class="py-3.5 px-5 text-right font-bold"><span class="${isLow ? 'text-rose-600' : ''}">${formatNumber(item.stock)}</span> <span class="text-xs font-normal text-slate-400 ml-1">${item.unit}</span></td>
                             <td class="py-3.5 px-5 text-center">${isLow ? '<span class="px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">Menipis</span>' : '<span class="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Aman</span>'}</td>
@@ -426,61 +378,31 @@
                 barisDitemukan = filteredRiwayat.length;
                 filteredRiwayat.forEach(r => {
                     const isMasuk = r.tipe === 'Masuk';
+                    // Tombol Edit hanya muncul jika User = Admin
+                    const actionBtn = userRole === 'admin' ? `<button onclick="pemicuEditTransaksi(${r.id})" class="px-2.5 py-1.5 bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-600 dark:bg-slate-800 dark:hover:bg-amber-900/40 rounded-lg text-xs font-semibold transition shadow-sm border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-pen-to-square"></i></button>` : `<span class="text-slate-300 dark:text-slate-600">-</span>`;
+                    
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
                             <td class="py-3.5 px-5 text-slate-600 dark:text-slate-300 font-medium text-[13px]">${formatTanggalPendek(r.created_at)}</td>
-                            <td class="py-3.5 px-5">
-                                <div class="font-semibold text-slate-700 dark:text-slate-200">${r.nama_item}</div>
-                                <div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ${r.lokasi || '-'}</div>
-                            </td>
+                            <td class="py-3.5 px-5"><div class="font-semibold text-slate-700 dark:text-slate-200">${r.nama_item}</div><div class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i> ${r.lokasi || '-'} ${r.catatan ? `<span class="ml-2 italic opacity-80 text-blue-500">"${r.catatan}"</span>` : ''}</div></td>
                             <td class="py-3.5 px-5">${isMasuk ? '<span class="text-emerald-600 dark:text-emerald-400 font-semibold"><i class="fa-solid fa-arrow-down-long mr-1"></i> Masuk</span>' : '<span class="text-rose-600 dark:text-rose-400 font-semibold"><i class="fa-solid fa-arrow-up-long mr-1"></i> Keluar</span>'}</td>
                             <td class="py-3.5 px-5 text-right font-bold">${formatNumber(r.jumlah)}</td>
+                            <td class="py-3.5 px-5 text-center">${actionBtn}</td>
                         </tr>`;
                 });
             }
             document.getElementById('emptyState').classList.toggle('hidden', barisDitemukan > 0);
         }
 
-        // 5. HELPER UMUM
-        function setWaktuSekarang() {
-            const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('inputTanggal').value = now.toISOString().slice(0,16);
-        }
-
-        function bukaModal(id) { 
-            const m = document.getElementById(id); m.classList.remove('hidden'); 
-            setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10);
-            if(id === 'modalTransaksi') setWaktuSekarang(); // Update jam ke saat ini tiap buka form
-        }
+        // 6. HELPER UMUM
+        function setWaktuSekarang() { const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); document.getElementById('inputTanggal').value = now.toISOString().slice(0,16); }
+        function bukaModal(id) { const m = document.getElementById(id); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0'); m.querySelector('div').classList.remove('scale-95'); }, 10); if(id === 'modalTransaksi') setWaktuSekarang(); }
         function tutupModal(id) { const m = document.getElementById(id); m.classList.add('opacity-0'); m.querySelector('div').classList.add('scale-95'); setTimeout(() => m.classList.add('hidden'), 300); }
         function formatNumber(num) { return new Intl.NumberFormat('id-ID').format(num); }
-        
-        function populateCategoryDropdowns() {
-            const selectNew = document.getElementById('newCategory'); selectNew.innerHTML = '';
-            const filterCat = document.getElementById('filterCategory'); const curr = filterCat.value; filterCat.innerHTML = '<option value="ALL">Semua Kategori</option>';
-            daftarKategori.forEach(kat => { selectNew.appendChild(new Option(kat, kat)); filterCat.appendChild(new Option(kat, kat)); });
-            filterCat.value = curr;
-        }
-        function populateSelectOptions() {
-            const select = document.getElementById('selectItem'); const val = select.value; select.innerHTML = '<option value="" disabled selected>-- Pilih Barang / BBM --</option>';
-            inventoryData.forEach(item => { select.appendChild(new Option(`[${item.id}] ${item.name} (${item.category})`, item.id)); });
-            if (val) select.value = val;
-        }
-        function handleItemSelectChange() {
-            const item = inventoryData.find(i => i.id === document.getElementById('selectItem').value);
-            const card = document.getElementById('itemInfoCard');
-            if (item) { 
-                card.classList.remove('hidden'); document.getElementById('infoCategory').textContent = item.category; document.getElementById('infoCurrentStock').textContent = `${formatNumber(item.stock)} ${item.unit}`; document.getElementById('inputUnitBadge').textContent = item.unit; 
-                // Otomatis isi lokasi saat pilih item
-                document.getElementById('inputLokasi').value = item.lokasi !== '-' ? item.lokasi : '';
-            } 
-            else card.classList.add('hidden');
-        }
-        function updateStats() {
-            let tBBM = 0, tUmum = 0, lowCount = 0;
-            inventoryData.forEach(i => { if (i.category.toLowerCase().includes('bbm')) tBBM += i.stock; else tUmum += i.stock; if (i.stock <= i.minStock) lowCount++; });
-            document.getElementById('statTotalItem').textContent = inventoryData.length; document.getElementById('statTotalBBM').textContent = `${formatNumber(tBBM)} L`; document.getElementById('statTotalUmum').textContent = `${formatNumber(tUmum)} Unit`; document.getElementById('statLowStock').textContent = `${lowCount} Item`;
-        }
+        function populateCategoryDropdowns() { const selectNew = document.getElementById('newCategory'); selectNew.innerHTML = ''; const filterCat = document.getElementById('filterCategory'); const curr = filterCat.value; filterCat.innerHTML = '<option value="ALL">Semua Kategori</option>'; daftarKategori.forEach(kat => { selectNew.appendChild(new Option(kat, kat)); filterCat.appendChild(new Option(kat, kat)); }); filterCat.value = curr; }
+        function populateSelectOptions() { const select = document.getElementById('selectItem'); const val = select.value; select.innerHTML = '<option value="" disabled selected>-- Pilih Barang / BBM --</option>'; inventoryData.forEach(item => { select.appendChild(new Option(`[${item.id}] ${item.name} (${item.category})`, item.id)); }); if (val) select.value = val; }
+        function handleItemSelectChange() { const item = inventoryData.find(i => i.id === document.getElementById('selectItem').value); const card = document.getElementById('itemInfoCard'); if (item) { card.classList.remove('hidden'); document.getElementById('infoCategory').textContent = item.category; document.getElementById('infoCurrentStock').textContent = `${formatNumber(item.stock)} ${item.unit}`; document.getElementById('inputUnitBadge').textContent = item.unit; document.getElementById('inputLokasi').value = item.lokasi !== '-' ? item.lokasi : ''; } else card.classList.add('hidden'); }
+        function updateStats() { let tBBM = 0, tUmum = 0, lowCount = 0; inventoryData.forEach(i => { if (i.category.toLowerCase().includes('bbm')) tBBM += i.stock; else tUmum += i.stock; if (i.stock <= i.minStock) lowCount++; }); document.getElementById('statTotalItem').textContent = inventoryData.length; document.getElementById('statTotalBBM').textContent = `${formatNumber(tBBM)} L`; document.getElementById('statTotalUmum').textContent = `${formatNumber(tUmum)} Unit`; document.getElementById('statLowStock').textContent = `${lowCount} Item`; }
 
         const htmlElement = document.documentElement;
         function initTheme() { const isDark = localStorage.getItem('theme') === 'dark'; htmlElement.classList.toggle('dark', isDark); updateThemeUI(isDark); }
