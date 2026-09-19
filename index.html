@@ -229,21 +229,52 @@
         }
         async function handleLogout() { await supabaseClient.auth.signOut(); showToast("Berhasil keluar.", "info"); cekSesiAktif(); }
 
-        // 2. DATA
+        // 2. AMBIL & OLAH DATA DARI SUPABASE
         async function muatDataDariSupabase() {
             document.getElementById('recordCountInfo').textContent = 'Mengambil data server...';
             try {
-                let { data: katData } = await supabaseClient.from('kategori').select('*'); daftarKategori = katData ? katData.map(k => k.nama_kategori) : [];
+                let { data: katData } = await supabaseClient.from('kategori').select('*');
+                daftarKategori = katData ? katData.map(k => k.nama_kategori) : [];
+
                 let { data: masterData } = await supabaseClient.from('master_barang').select('*');
                 let { data: transData } = await supabaseClient.from('transaksi').select('*').order('created_at', { ascending: false });
                 riwayatData = transData || []; 
 
                 inventoryData = (masterData || []).map(item => {
-                    let totalStok = 0; let namaCari = `[${item.id}] ${item.nama_item} (${item.kategori})`;
-                    riwayatData.forEach(t => { if (t.nama_item === namaCari) { let qty = parseFloat(t.jumlah) || 0; if (t.tipe === 'Masuk') totalStok += qty; else if (t.tipe === 'Keluar') totalStok -= qty; } });
-                    return { id: item.id, name: item.nama_item, category: item.kategori, unit: item.satuan, minStock: parseFloat(item.batas_min) || 0, stock: totalStok, lokasi: item.lokasi || '-' };
+                    let totalStok = 0; 
+                    
+                    // PERBAIKAN 1: Kita gunakan ID Barang sebagai kunci pencocokan yang anti-gagal
+                    let idPencarian = `[${item.id}]`;
+                    let lokasiAktif = item.lokasi && item.lokasi !== '-' ? item.lokasi : '-';
+
+                    // PERBAIKAN 2: Deteksi lokasi terakhir otomatis dari riwayat transaksi
+                    let transaksiTerbaru = riwayatData.find(t => t.nama_item && t.nama_item.startsWith(idPencarian));
+                    if (transaksiTerbaru && transaksiTerbaru.lokasi) {
+                        lokasiAktif = transaksiTerbaru.lokasi;
+                    }
+
+                    riwayatData.forEach(t => {
+                        // Sistem sekarang mencocokkan [MDI-XXXX] alih-alih nama penuh
+                        if (t.nama_item && t.nama_item.startsWith(idPencarian)) {
+                            let qty = parseFloat(t.jumlah) || 0;
+                            if (t.tipe === 'Masuk') totalStok += qty; 
+                            else if (t.tipe === 'Keluar') totalStok -= qty;
+                        }
+                    });
+
+                    return { 
+                        id: item.id, 
+                        name: item.nama_item, 
+                        category: item.kategori, 
+                        unit: item.satuan, 
+                        minStock: parseFloat(item.batas_min) || 0, 
+                        stock: totalStok, 
+                        lokasi: lokasiAktif 
+                    };
                 });
-                populateSelectOptions(); populateCategoryDropdowns(); renderTables(); updateStats(); document.getElementById('recordCountInfo').textContent = `Sinkronisasi Selesai.`;
+
+                populateSelectOptions(); populateCategoryDropdowns(); renderTables(); updateStats();
+                document.getElementById('recordCountInfo').textContent = `Sinkronisasi Selesai.`;
             } catch (error) { console.error(error); }
         }
 
