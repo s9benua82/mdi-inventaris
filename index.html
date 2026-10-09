@@ -112,13 +112,16 @@
 
             <!-- Footer Sidebar -->
             <div class="p-4 border-t border-slate-800">
-                <div id="sidebarUserBox" class="hidden items-center gap-3 bg-slate-800/50 rounded-xl p-2.5">
-                    <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-xs font-bold" id="sidebarAvatar">U</div>
-                    <div class="flex-1 min-w-0">
-                        <p id="sidebarUserName" class="text-xs font-bold text-white truncate">User</p>
-                        <p id="sidebarUserRole" class="text-[10px] text-emerald-400 uppercase font-semibold">ROLE</p>
-                    </div>
-                </div>
+                <div id="sidebarUserBox" class="hidden items-center gap-2 bg-slate-800/50 rounded-xl p-2.5">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shrink-0" id="sidebarAvatar">U</div>
+                 <div class="flex-1 min-w-0">
+                   <p id="sidebarUserName" class="text-xs font-bold text-white truncate">User</p>
+                   <p id="sidebarUserRole" class="text-[10px] text-emerald-400 uppercase font-semibold">ROLE</p>
+                 </div>
+                 <button onclick="handleLogout()" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-rose-600 text-slate-300 hover:text-white transition shrink-0" title="Logout">
+                   <i class="fa-solid fa-power-off text-xs"></i>
+                </button>
+            </div>
                 <button id="sidebarLoginBtn" onclick="bukaModal('modalLogin')" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition">
                     <i class="fa-solid fa-user-lock"></i> Login
                 </button>
