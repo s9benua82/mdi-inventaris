@@ -55,6 +55,146 @@
         </div>
     </div>
 
+    <!-- MODAL TAMBAH UNIT -->
+<div id="modalTambahUnit" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-plus text-blue-600 mr-2"></i>Tambah Unit Baru</h3>
+            <button onclick="tutupModal('modalTambahUnit')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form id="formTambahUnit" onsubmit="handleTambahUnit(event)" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pilih Barang *</label>
+                <select id="unitBarangSelect" required onchange="updateUnitPreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                    <option value="" disabled selected>-- Pilih barang --</option>
+                </select>
+                <p class="text-[11px] text-slate-400 mt-1">Hanya barang dengan tipe <b>aset</b> yang bisa punya unit</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi Awal *</label>
+                    <select id="unitLokasiSelect" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                        <option value="" disabled selected>-- Pilih --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kondisi Awal *</label>
+                    <select id="unitKondisiSelect" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                        <option value="Baik" selected>Baik</option>
+                        <option value="Rusak Ringan">Rusak Ringan</option>
+                        <option value="Rusak Berat">Rusak Berat</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Jumlah Unit *</label>
+                <input type="number" id="unitJumlahInput" required min="1" max="100" value="1" oninput="updateUnitPreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                <p class="text-[11px] text-slate-400 mt-1">Maksimal 100 unit per input</p>
+            </div>
+            <div id="unitPreviewBox" class="hidden p-4 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50">
+                <p class="text-xs font-bold text-blue-700 dark:text-blue-300 mb-2"><i class="fa-solid fa-eye mr-1"></i> Preview kode unit yang akan dibuat:</p>
+                <div id="unitPreviewList" class="max-h-32 overflow-y-auto font-mono text-xs text-blue-800 dark:text-blue-300 space-y-0.5"></div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="tutupModal('modalTambahUnit')" class="flex-1 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-sm transition">Batal</button>
+                <button type="submit" id="btnSubmitUnit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md transition">Simpan Unit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL EDIT UNIT -->
+<div id="modalEditUnit" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-pen text-amber-500 mr-2"></i>Edit Unit</h3>
+            <button onclick="tutupModal('modalEditUnit')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form id="formEditUnit" onsubmit="handleEditUnit(event)" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <input type="hidden" id="editUnitId">
+            <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <p class="text-xs text-slate-500">Kode Unit</p>
+                <p id="editUnitKode" class="font-mono font-bold text-slate-700 dark:text-slate-200">-</p>
+                <p id="editUnitNama" class="text-xs text-slate-500 mt-1">-</p>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Lokasi *</label>
+                <select id="editUnitLokasi" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kondisi *</label>
+                    <select id="editUnitKondisi" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                        <option value="Baik">Baik</option>
+                        <option value="Rusak Ringan">Rusak Ringan</option>
+                        <option value="Rusak Berat">Rusak Berat</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Status *</label>
+                    <select id="editUnitStatus" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Diperbaiki">Diperbaiki</option>
+                        <option value="Dibuang">Dibuang</option>
+                        <option value="Hilang">Hilang</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Keterangan</label>
+                <input type="text" id="editUnitKeterangan" placeholder="Opsional" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="tutupModal('modalEditUnit')" class="flex-1 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-sm transition">Batal</button>
+                <button type="submit" id="btnSubmitEditUnit" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl text-sm shadow-md transition">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL DETAIL UNIT -->
+<div id="modalDetailUnit" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-circle-info text-blue-600 mr-2"></i>Detail Unit</h3>
+            <button onclick="tutupModal('modalDetailUnit')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/50">
+                <p class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Kode Unit</p>
+                <p id="detailUnitKode" class="font-mono font-black text-2xl text-slate-800 dark:text-white mt-1">-</p>
+                <p id="detailUnitNama" class="text-sm text-slate-600 dark:text-slate-400 mt-1">-</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Lokasi</p>
+                    <p id="detailUnitLokasi" class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Kondisi</p>
+                    <p id="detailUnitKondisi" class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Status</p>
+                    <p id="detailUnitStatus" class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">-</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Tgl Masuk</p>
+                    <p id="detailUnitTgl" class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-0.5">-</p>
+                </div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+                <p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Keterangan</p>
+                <p id="detailUnitKeterangan" class="text-sm text-slate-700 dark:text-slate-300">-</p>
+            </div>
+            <div class="p-6 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 text-center">
+                <i class="fa-solid fa-qrcode text-4xl text-slate-300 dark:text-slate-600"></i>
+                <p class="text-xs text-slate-400 mt-2">QR Code akan tersedia di FASE 5.5</p>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- LAYOUT UTAMA -->
     <div class="flex h-screen overflow-hidden">
 
@@ -221,17 +361,68 @@
                     </div>
                 </div>
 
-                <!-- HALAMAN: UNIT BARANG -->
+                <<!-- HALAMAN: UNIT BARANG -->
                 <div id="page-unit" class="page">
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-8 text-center">
-                        <div class="w-20 h-20 mx-auto rounded-2xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center mb-4">
-                            <i class="fa-solid fa-barcode text-3xl text-blue-600 dark:text-blue-400"></i>
+                <!-- Toolbar -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 mb-4">
+                        <div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+                            <div class="flex flex-col sm:flex-row gap-2 flex-1">
+                                <div class="relative flex-1 min-w-[200px]">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400 text-sm"></i>
+                                <input type="text" id="searchUnit" oninput="renderUnit()" placeholder="Cari kode unit..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                                    </div>
+                                    <select id="filterUnitBarang" onchange="renderUnit()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                                        <option value="ALL">Semua Barang</option>
+                                    </select>
+                                    <select id="filterUnitLokasi" onchange="renderUnit()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                                        <option value="ALL">Semua Lokasi</option>
+                                    </select>
+                                    <select id="filterUnitKondisi" onchange="renderUnit()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                                        <option value="ALL">Semua Kondisi</option>
+                                        <option value="Baik">Baik</option>
+                                        <option value="Rusak Ringan">Rusak Ringan</option>
+                                        <option value="Rusak Berat">Rusak Berat</option>
+                                    </select>
+                                    <select id="filterUnitStatus" onchange="renderUnit()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                                        <option value="ALL">Semua Status</option>
+                                        <option value="Aktif">Aktif</option>
+                                        <option value="Diperbaiki">Diperbaiki</option>
+                                        <option value="Dibuang">Dibuang</option>
+                                        <option value="Hilang">Hilang</option>
+                                    </select>
+                                </div>
+                                <button id="btnTambahUnit" onclick="bukaModalTambahUnit()" class="hidden px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition shadow-sm whitespace-nowrap">
+                                    <i class="fa-solid fa-plus mr-1"></i> Tambah Unit
+                                </button>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Halaman Unit Barang</h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Fitur lengkap akan tersedia di <b>Sub-FASE 5.2 Sesi 2</b></p>
-                        <p class="text-xs text-slate-400">(Modal input unit, edit unit, filter, dan pencarian)</p>
+
+                        <!-- Info Ringkasan -->
+                        <div id="unitSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
+
+                        <!-- Tabel Unit -->
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse min-w-[850px]">
+                                    <thead>
+                                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                                            <th class="py-3.5 px-5 w-32">Kode Unit</th>
+                                            <th class="py-3.5 px-5">Nama Barang</th>
+                                            <th class="py-3.5 px-5">Lokasi</th>
+                                            <th class="py-3.5 px-5 text-center">Kondisi</th>
+                                            <th class="py-3.5 px-5 text-center">Status</th>
+                                            <th class="py-3.5 px-5 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="unitTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
+                                </table>
+                            </div>
+                            <div id="unitEmptyState" class="hidden p-10 text-center">
+                                <i class="fa-solid fa-barcode text-5xl text-slate-200 dark:text-slate-700 mb-3"></i>
+                                <p class="text-slate-500 text-sm font-medium">Belum ada unit. Klik "Tambah Unit" untuk mulai.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
                 <!-- HALAMAN: TRANSAKSI -->
                 <div id="page-transaksi" class="page">
@@ -655,12 +846,395 @@
             }, 3500);
         }
 
+                // ==========================================
+        // 9. UNIT BARANG
+        // ==========================================
+        let unitsData = [];
+
+        async function muatUnits() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('item_units')
+                    .select(`
+                        id, kode_unit, kondisi, status, tgl_masuk, tgl_update, keterangan,
+                        item_id,
+                        items!item_units_item_id_fkey ( kode_barang, nama ),
+                        locations!item_units_location_id_fkey ( id, nama )
+                    `)
+                    .order('kode_unit', { ascending: true });
+                if (error) throw error;
+                unitsData = data || [];
+                renderUnit();
+            } catch (err) {
+                console.error('Error load units:', err);
+                showToast('Gagal memuat unit: ' + err.message, 'error');
+            }
+        }
+
+        function populateUnitDropdowns() {
+            // Barang (hanya tipe aset)
+            const selBarang = document.getElementById('unitBarangSelect');
+            const filterBarang = document.getElementById('filterUnitBarang');
+            const barangAset = inventoryData.filter(i => i.tipe === 'aset');
+            
+            selBarang.innerHTML = '<option value="" disabled selected>-- Pilih barang --</option>' +
+                barangAset.map(i => `<option value="${i.itemId}">[${i.kode}] ${i.nama}</option>`).join('');
+            
+            const currFilter = filterBarang.value;
+            filterBarang.innerHTML = '<option value="ALL">Semua Barang</option>' +
+                barangAset.map(i => `<option value="${i.itemId}">${i.nama}</option>`).join('');
+            filterBarang.value = currFilter;
+
+            // Lokasi
+            const selLokasi = document.getElementById('unitLokasiSelect');
+            const filterLokasi = document.getElementById('filterUnitLokasi');
+            const editLokasi = document.getElementById('editUnitLokasi');
+            
+            selLokasi.innerHTML = '<option value="" disabled selected>-- Pilih --</option>' +
+                daftarLokasi.map(l => `<option value="${l.id}">${l.nama}</option>`).join('');
+            
+            const currFilterLok = filterLokasi.value;
+            filterLokasi.innerHTML = '<option value="ALL">Semua Lokasi</option>' +
+                daftarLokasi.map(l => `<option value="${l.id}">${l.nama}</option>`).join('');
+            filterLokasi.value = currFilterLok;
+
+            editLokasi.innerHTML = daftarLokasi.map(l => `<option value="${l.id}">${l.nama}</option>`).join('');
+        }
+
+        function renderUnit() {
+            const search = (document.getElementById('searchUnit')?.value || '').toLowerCase();
+            const filterBarang = document.getElementById('filterUnitBarang')?.value || 'ALL';
+            const filterLokasi = document.getElementById('filterUnitLokasi')?.value || 'ALL';
+            const filterKondisi = document.getElementById('filterUnitKondisi')?.value || 'ALL';
+            const filterStatus = document.getElementById('filterUnitStatus')?.value || 'ALL';
+
+            const filtered = unitsData.filter(u => {
+                const matchSearch = !search || u.kode_unit.toLowerCase().includes(search);
+                const matchBarang = filterBarang === 'ALL' || String(u.item_id) === filterBarang;
+                const matchLokasi = filterLokasi === 'ALL' || String(u.location_id) === filterLokasi;
+                const matchKondisi = filterKondisi === 'ALL' || u.kondisi === filterKondisi;
+                const matchStatus = filterStatus === 'ALL' || u.status === filterStatus;
+                return matchSearch && matchBarang && matchLokasi && matchKondisi && matchStatus;
+            });
+
+            // Summary
+            const total = unitsData.length;
+            const aktif = unitsData.filter(u => u.status === 'Aktif').length;
+            const baik = unitsData.filter(u => u.kondisi === 'Baik' && u.status === 'Aktif').length;
+            const rusak = unitsData.filter(u => u.kondisi.startsWith('Rusak') && u.status === 'Aktif').length;
+            
+            document.getElementById('unitSummary').innerHTML = `
+                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Total Unit</p>
+                    <p class="text-xl font-bold text-slate-800 dark:text-white mt-0.5">${total}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Aktif</p>
+                    <p class="text-xl font-bold text-blue-600 mt-0.5">${aktif}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Baik</p>
+                    <p class="text-xl font-bold text-emerald-600 mt-0.5">${baik}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Rusak</p>
+                    <p class="text-xl font-bold text-rose-600 mt-0.5">${rusak}</p>
+                </div>
+            `;
+
+            // Table
+            const tbody = document.getElementById('unitTableBody');
+            tbody.innerHTML = filtered.map(u => {
+                const kondisiBadge = u.kondisi === 'Baik'
+                    ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Baik</span>'
+                    : u.kondisi === 'Rusak Ringan'
+                        ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400">Rusak Ringan</span>'
+                        : '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">Rusak Berat</span>';
+                
+                const statusBadge = u.status === 'Aktif'
+                    ? '<span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Aktif</span>'
+                    : u.status === 'Diperbaiki'
+                        ? '<span class="text-xs font-semibold text-amber-600 dark:text-amber-400">Diperbaiki</span>'
+                        : u.status === 'Dibuang'
+                            ? '<span class="text-xs font-semibold text-slate-400">Dibuang</span>'
+                            : '<span class="text-xs font-semibold text-rose-600 dark:text-rose-400">Hilang</span>';
+
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                        <td class="py-3.5 px-5 font-mono text-xs font-bold">${u.kode_unit}</td>
+                        <td class="py-3.5 px-5 font-semibold">${u.items?.nama || '-'}</td>
+                        <td class="py-3.5 px-5 text-[13px] text-slate-600 dark:text-slate-400"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${u.locations?.nama || '-'}</td>
+                        <td class="py-3.5 px-5 text-center">${kondisiBadge}</td>
+                        <td class="py-3.5 px-5 text-center">${statusBadge}</td>
+                        <td class="py-3.5 px-5 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="bukaDetailUnit(${u.id})" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-500 hover:text-blue-600 dark:bg-slate-800 dark:hover:bg-blue-950 transition" title="Detail"><i class="fa-solid fa-eye text-xs"></i></button>
+                                <button onclick="bukaEditUnit(${u.id})" class="p-1.5 rounded-lg bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-600 dark:bg-slate-800 dark:hover:bg-amber-950 transition" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="bukaHapusUnit(${u.id})" class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950 transition" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('unitEmptyState').classList.toggle('hidden', filtered.length > 0);
+        }
+
+        function bukaModalTambahUnit() {
+            populateUnitDropdowns();
+            document.getElementById('formTambahUnit').reset();
+            document.getElementById('unitPreviewBox').classList.add('hidden');
+            bukaModal('modalTambahUnit');
+        }
+
+        async function updateUnitPreview() {
+            const itemId = parseInt(document.getElementById('unitBarangSelect').value);
+            const jumlah = parseInt(document.getElementById('unitJumlahInput').value) || 0;
+            const box = document.getElementById('unitPreviewBox');
+            const list = document.getElementById('unitPreviewList');
+
+            if (!itemId || jumlah < 1) {
+                box.classList.add('hidden');
+                return;
+            }
+
+            const item = inventoryData.find(i => i.itemId === itemId);
+            if (!item) {
+                box.classList.add('hidden');
+                return;
+            }
+
+            try {
+                // Dapatkan kode unit berikutnya
+                const { data: lastUnits } = await supabaseClient
+                    .from('item_units')
+                    .select('kode_unit')
+                    .eq('item_id', itemId)
+                    .order('kode_unit', { ascending: false })
+                    .limit(1);
+
+                let nextNum = 1;
+                if (lastUnits && lastUnits.length > 0) {
+                    const match = lastUnits[0].kode_unit.match(/-(\d+)$/);
+                    if (match) nextNum = parseInt(match[1]) + 1;
+                }
+
+                const preview = [];
+                for (let i = 0; i < jumlah; i++) {
+                    preview.push(`${item.kode}-${String(nextNum + i).padStart(3, '0')}`);
+                }
+
+                list.innerHTML = preview.map(k => `<div>• ${k}</div>`).join('');
+                box.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function handleTambahUnit(e) {
+            e.preventDefault();
+            const itemId = parseInt(document.getElementById('unitBarangSelect').value);
+            const locationId = parseInt(document.getElementById('unitLokasiSelect').value);
+            const kondisi = document.getElementById('unitKondisiSelect').value;
+            const jumlah = parseInt(document.getElementById('unitJumlahInput').value);
+
+            if (!itemId || !locationId || jumlah < 1) {
+                return showToast('Isi semua field dengan benar', 'error');
+            }
+
+            const item = inventoryData.find(i => i.itemId === itemId);
+            if (!item) return showToast('Barang tidak ditemukan', 'error');
+
+            const btn = document.getElementById('btnSubmitUnit');
+            const old = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            try {
+                // Cari kode terakhir
+                const { data: lastUnits } = await supabaseClient
+                    .from('item_units')
+                    .select('kode_unit')
+                    .eq('item_id', itemId)
+                    .order('kode_unit', { ascending: false })
+                    .limit(1);
+
+                let nextNum = 1;
+                if (lastUnits && lastUnits.length > 0) {
+                    const match = lastUnits[0].kode_unit.match(/-(\d+)$/);
+                    if (match) nextNum = parseInt(match[1]) + 1;
+                }
+
+                // Buat array insert
+                const inserts = [];
+                for (let i = 0; i < jumlah; i++) {
+                    inserts.push({
+                        kode_unit: `${item.kode}-${String(nextNum + i).padStart(3, '0')}`,
+                        item_id: itemId,
+                        location_id: locationId,
+                        kondisi: kondisi,
+                        status: 'Aktif',
+                        tgl_masuk: new Date().toISOString().split('T')[0]
+                    });
+                }
+
+                const { error } = await supabaseClient.from('item_units').insert(inserts);
+                if (error) throw error;
+
+                showToast(`${jumlah} unit berhasil ditambahkan!`, 'success');
+                tutupModal('modalTambahUnit');
+                await muatUnits();
+                await muatDataDariSupabase();
+            } catch (err) {
+                showToast('Gagal: ' + err.message, 'error');
+            } finally {
+                btn.innerHTML = old;
+                btn.disabled = false;
+            }
+        }
+
+        function bukaEditUnit(id) {
+            const unit = unitsData.find(u => u.id === id);
+            if (!unit) return showToast('Unit tidak ditemukan', 'error');
+
+            document.getElementById('editUnitId').value = unit.id;
+            document.getElementById('editUnitKode').textContent = unit.kode_unit;
+            document.getElementById('editUnitNama').textContent = unit.items?.nama || '-';
+            document.getElementById('editUnitLokasi').value = unit.location_id || '';
+            document.getElementById('editUnitKondisi').value = unit.kondisi;
+            document.getElementById('editUnitStatus').value = unit.status;
+            document.getElementById('editUnitKeterangan').value = unit.keterangan || '';
+            bukaModal('modalEditUnit');
+        }
+
+        async function handleEditUnit(e) {
+            e.preventDefault();
+            const id = document.getElementById('editUnitId').value;
+            const oldUnit = unitsData.find(u => u.id === parseInt(id));
+            if (!oldUnit) return showToast('Unit tidak ditemukan', 'error');
+
+            const newLocationId = parseInt(document.getElementById('editUnitLokasi').value);
+            const newKondisi = document.getElementById('editUnitKondisi').value;
+            const newStatus = document.getElementById('editUnitStatus').value;
+            const newKeterangan = document.getElementById('editUnitKeterangan').value;
+
+            const btn = document.getElementById('btnSubmitEditUnit');
+            const old = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('item_units')
+                    .update({
+                        location_id: newLocationId,
+                        kondisi: newKondisi,
+                        status: newStatus,
+                        keterangan: newKeterangan,
+                        tgl_update: new Date().toISOString()
+                    })
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                // Kalau lokasi berubah, catat transaksi "Pindah"
+                if (oldUnit.location_id !== newLocationId) {
+                    await supabaseClient.from('transactions').insert([{
+                        tgl: new Date().toISOString(),
+                        tipe: 'Pindah',
+                        item_id: oldUnit.item_id,
+                        unit_id: parseInt(id),
+                        qty: 1,
+                        dari_lokasi: oldUnit.location_id,
+                        ke_lokasi: newLocationId,
+                        kondisi_lama: oldUnit.kondisi,
+                        kondisi_baru: newKondisi,
+                        catatan: 'Perpindahan via edit unit',
+                        user_id: currentUser ? currentUser.id : null
+                    }]);
+                }
+
+                showToast('Unit berhasil diupdate!', 'success');
+                tutupModal('modalEditUnit');
+                await muatUnits();
+                await muatDataDariSupabase();
+            } catch (err) {
+                showToast('Gagal: ' + err.message, 'error');
+            } finally {
+                btn.innerHTML = old;
+                btn.disabled = false;
+            }
+        }
+
+        function bukaDetailUnit(id) {
+            const unit = unitsData.find(u => u.id === id);
+            if (!unit) return showToast('Unit tidak ditemukan', 'error');
+
+            document.getElementById('detailUnitKode').textContent = unit.kode_unit;
+            document.getElementById('detailUnitNama').textContent = `[${unit.items?.kode_barang || '-'}] ${unit.items?.nama || '-'}`;
+            document.getElementById('detailUnitLokasi').textContent = unit.locations?.nama || '-';
+            document.getElementById('detailUnitKondisi').textContent = unit.kondisi;
+            document.getElementById('detailUnitStatus').textContent = unit.status;
+            document.getElementById('detailUnitTgl').textContent = unit.tgl_masuk ? new Date(unit.tgl_masuk).toLocaleDateString('id-ID') : '-';
+            document.getElementById('detailUnitKeterangan').textContent = unit.keterangan || '-';
+            bukaModal('modalDetailUnit');
+        }
+
+        async function bukaHapusUnit(id) {
+            const unit = unitsData.find(u => u.id === id);
+            if (!unit) return;
+
+            if (!confirm(`Hapus unit ${unit.kode_unit}?\n\nStatus akan diubah menjadi "Dibuang" (soft delete). Data tetap tersimpan untuk audit trail.`)) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('item_units')
+                    .update({ status: 'Dibuang', tgl_update: new Date().toISOString() })
+                    .eq('id', id);
+
+                if (error) throw error;
+                showToast('Unit ditandai sebagai Dibuang', 'success');
+                await muatUnits();
+            } catch (err) {
+                showToast('Gagal: ' + err.message, 'error');
+            }
+        }
+
+        // Update gantiHalaman untuk load unit saat masuk halaman unit
+        const originalGantiHalaman = gantiHalaman;
+        gantiHalaman = function(page) {
+            originalGantiHalaman(page);
+            if (page === 'unit') {
+                populateUnitDropdowns();
+                muatUnits();
+            }
+            if (page === 'transaksi') {
+                renderTransaksi();
+            }
+        };
+
+        // Update terapkanHakAkses untuk tombol Tambah Unit
+        const originalTerapkanHakAkses = terapkanHakAkses;
+        terapkanHakAkses = function() {
+            originalTerapkanHakAkses();
+            const btnTambahUnit = document.getElementById('btnTambahUnit');
+            if (btnTambahUnit) {
+                if (currentUser && (userRole === 'admin' || userRole === 'operator')) {
+                    btnTambahUnit.classList.remove('hidden');
+                } else {
+                    btnTambahUnit.classList.add('hidden');
+                }
+            }
+        };
+
         window.addEventListener('DOMContentLoaded', async () => {
-            initTheme();
-            gantiHalaman('dashboard');
-            await cekSesiAktif();
-            await muatDataDariSupabase();
-        });
+    initTheme();
+    gantiHalaman('dashboard');
+    await cekSesiAktif();
+    await muatDataDariSupabase();
+    populateUnitDropdowns();
+    await muatUnits();
+});
     </script>
 </body>
 </html>
