@@ -152,6 +152,57 @@
     </div>
 </div>
 
+<!-- MODAL EDIT BARANG -->
+<div id="modalEditBarang" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-pen text-amber-500 mr-2"></i>Edit Barang</h3>
+            <button onclick="tutupModal('modalEditBarang')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form id="formEditBarang" onsubmit="handleEditBarang(event)" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <input type="hidden" id="editBarangId">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kode Barang</label>
+                <input type="text" id="editBarangKode" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-sm outline-none font-mono">
+                <p class="text-[11px] text-slate-400 mt-1">Kode tidak bisa diubah</p>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Barang *</label>
+                <input type="text" id="editBarangNama" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kategori *</label>
+                    <select id="editBarangKategori" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Tipe</label>
+                    <input type="text" id="editBarangTipe" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-sm outline-none uppercase font-semibold">
+                    <p class="text-[11px] text-slate-400 mt-1">Tipe tidak bisa diubah</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Satuan *</label>
+                    <input type="text" id="editBarangSatuan" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Batas Min</label>
+                    <input type="number" id="editBarangBatasMin" min="0" value="0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Keterangan</label>
+                <input type="text" id="editBarangKeterangan" placeholder="Opsional" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm outline-none">
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="tutupModal('modalEditBarang')" class="flex-1 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-sm transition">Batal</button>
+                <button type="submit" id="btnSubmitEditBarang" class="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl text-sm shadow-md transition">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- MODAL DETAIL UNIT -->
 <div id="modalDetailUnit" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
     <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300">
@@ -424,6 +475,111 @@
                         </div>
                     </div>
 
+                <!-- HALAMAN: DETAIL BARANG -->
+<div id="page-detail-barang" class="page">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs mb-4 text-slate-500 dark:text-slate-400">
+        <a href="#" onclick="gantiHalaman('master'); return false;" class="hover:text-blue-600 transition">
+            <i class="fa-solid fa-arrow-left mr-1"></i>Master Barang
+        </a>
+        <i class="fa-solid fa-chevron-right text-[10px] opacity-50"></i>
+        <span id="breadcrumbNama" class="font-semibold text-slate-700 dark:text-slate-200">Detail Barang</span>
+    </nav>
+
+    <!-- Info Barang Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div class="flex items-start gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white shrink-0 shadow-md">
+                    <i class="fa-solid fa-box-open text-2xl"></i>
+                </div>
+                <div>
+                    <h1 id="detailBarangNama" class="text-xl font-extrabold text-slate-900 dark:text-white">Nama Barang</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        <span id="detailBarangKode" class="font-mono font-bold text-slate-700 dark:text-slate-300">-</span>
+                        <span class="mx-1">•</span>
+                        <span id="detailBarangKategori" class="font-semibold">Kategori</span>
+                        <span class="mx-1">•</span>
+                        <span id="detailBarangTipe" class="font-semibold uppercase text-blue-600">Tipe</span>
+                    </p>
+                    <p id="detailBarangKeterangan" class="text-xs text-slate-500 dark:text-slate-400 mt-2 hidden"></p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button id="btnDetailTambahUnit" onclick="bukaTambahUnitDariDetail()" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                    <i class="fa-solid fa-plus mr-1"></i> Tambah Unit
+                </button>
+                <button onclick="showToast('Fitur cetak QR akan hadir di FASE 5.5', 'info')" class="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 text-xs font-bold rounded-xl transition">
+                    <i class="fa-solid fa-qrcode mr-1"></i> Cetak QR
+                </button>
+                <button id="btnDetailEditBarang" onclick="bukaEditBarang()" class="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 text-xs font-bold rounded-xl transition">
+                    <i class="fa-solid fa-pen mr-1"></i> Edit
+                </button>
+                <button id="btnDetailHapusBarang" onclick="bukaHapusBarang()" class="px-3 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 text-xs font-bold rounded-xl transition">
+                    <i class="fa-solid fa-trash mr-1"></i> Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ringkasan Unit -->
+    <div id="detailBarangSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
+
+    <!-- Tab: Unit & Riwayat -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="px-4 sm:px-5 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex gap-6">
+                <button id="btnTabDetailUnit" onclick="gantiTabDetail('unit')" class="py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition">Daftar Unit</button>
+                <button id="btnTabDetailRiwayat" onclick="gantiTabDetail('riwayat')" class="py-3 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent transition">Riwayat Transaksi</button>
+            </div>
+        </div>
+
+        <!-- Tab Unit -->
+        <div id="tabDetailUnit" class="tab-content active">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                            <th class="py-3.5 px-5 w-32">Kode Unit</th>
+                            <th class="py-3.5 px-5">Lokasi</th>
+                            <th class="py-3.5 px-5 text-center">Kondisi</th>
+                            <th class="py-3.5 px-5 text-center">Status</th>
+                            <th class="py-3.5 px-5 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailUnitTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
+                </table>
+            </div>
+            <div id="detailUnitEmptyState" class="hidden p-10 text-center">
+                <i class="fa-solid fa-barcode text-5xl text-slate-200 dark:text-slate-700 mb-3"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada unit untuk barang ini.</p>
+            </div>
+        </div>
+
+        <!-- Tab Riwayat -->
+        <div id="tabDetailRiwayat" class="tab-content">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                            <th class="py-3.5 px-5 w-40">Waktu</th>
+                            <th class="py-3.5 px-5">Unit</th>
+                            <th class="py-3.5 px-5">Lokasi</th>
+                            <th class="py-3.5 px-5 text-center">Tipe</th>
+                            <th class="py-3.5 px-5 text-right">Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailRiwayatTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
+                </table>
+            </div>
+            <div id="detailRiwayatEmptyState" class="hidden p-10 text-center">
+                <i class="fa-solid fa-clock-rotate-left text-5xl text-slate-200 dark:text-slate-700 mb-3"></i>
+                <p class="text-slate-500 text-sm font-medium">Belum ada riwayat transaksi.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
                 <!-- HALAMAN: TRANSAKSI -->
                 <div id="page-transaksi" class="page">
                     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
@@ -483,11 +639,12 @@
         // 1. NAVIGASI HALAMAN
         // ==========================================
         const PAGE_TITLES = {
-            dashboard: { title: 'Dashboard', subtitle: 'Ringkasan inventaris' },
-            master: { title: 'Master Barang', subtitle: 'Daftar semua jenis barang' },
-            unit: { title: 'Unit Barang', subtitle: 'Daftar unit fisik per barang' },
-            transaksi: { title: 'Transaksi', subtitle: 'Riwayat masuk & keluar' }
-        };
+    dashboard: { title: 'Dashboard', subtitle: 'Ringkasan inventaris' },
+    master: { title: 'Master Barang', subtitle: 'Daftar semua jenis barang' },
+    unit: { title: 'Unit Barang', subtitle: 'Daftar unit fisik per barang' },
+    transaksi: { title: 'Transaksi', subtitle: 'Riwayat masuk & keluar' },
+    'detail-barang': { title: 'Detail Barang', subtitle: '' }
+};
 
         function gantiHalaman(page) {
             halamanAktif = page;
@@ -720,15 +877,15 @@
                         ? '<span class="px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">Menipis</span>'
                         : '<span class="px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Aman</span>');
                 return `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                        <td class="py-3.5 px-5 font-mono text-xs">${i.kode}</td>
-                        <td class="py-3.5 px-5 font-semibold">${i.nama}</td>
-                        <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">${i.kategori || '-'}</span></td>
-                        <td class="py-3.5 px-5 text-center text-xs uppercase font-semibold text-slate-500">${i.tipe}</td>
-                        <td class="py-3.5 px-5 text-right font-bold">${formatNumber(i.stok)} <span class="text-xs font-normal text-slate-400">${i.satuan}</span></td>
-                        <td class="py-3.5 px-5 text-center">${status}</td>
-                    </tr>
-                `;
+    <tr onclick="bukaDetailBarang(${i.itemId})" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition cursor-pointer">
+        <td class="py-3.5 px-5 font-mono text-xs">${i.kode}</td>
+        <td class="py-3.5 px-5 font-semibold">${i.nama}</td>
+        <td class="py-3.5 px-5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">${i.kategori || '-'}</span></td>
+        <td class="py-3.5 px-5 text-center text-xs uppercase font-semibold text-slate-500">${i.tipe}</td>
+        <td class="py-3.5 px-5 text-right font-bold">${formatNumber(i.stok)} <span class="text-xs font-normal text-slate-400">${i.satuan}</span></td>
+        <td class="py-3.5 px-5 text-center">${status}</td>
+    </tr>
+`;
             }).join('');
         }
 
@@ -1214,8 +1371,11 @@
                 muatUnits();
             }
             if (page === 'transaksi') {
-                renderTransaksi();
-            }
+    renderTransaksi();
+}
+if (page === 'master') {
+    renderMaster();
+}
         };
 
         // Update terapkanHakAkses untuk tombol Tambah Unit
@@ -1231,6 +1391,315 @@
                 }
             }
         };
+
+        // ==========================================
+        // 10. DETAIL BARANG
+        // ==========================================
+        let barangDetailAktif = null;
+        let tabDetailAktif = 'unit';
+        let unitBarangDetailData = [];
+        let riwayatBarangDetailData = [];
+
+        function gantiTabDetail(tab) {
+            tabDetailAktif = tab;
+            const btnUnit = document.getElementById('btnTabDetailUnit');
+            const btnRiwayat = document.getElementById('btnTabDetailRiwayat');
+            if (tab === 'unit') {
+                btnUnit.className = 'py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition';
+                btnRiwayat.className = 'py-3 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent transition';
+                document.getElementById('tabDetailUnit').classList.add('active');
+                document.getElementById('tabDetailRiwayat').classList.remove('active');
+            } else {
+                btnUnit.className = 'py-3 text-sm font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent transition';
+                btnRiwayat.className = 'py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition';
+                document.getElementById('tabDetailUnit').classList.remove('active');
+                document.getElementById('tabDetailRiwayat').classList.add('active');
+            }
+        }
+
+        async function bukaDetailBarang(itemId) {
+            const barang = inventoryData.find(i => i.itemId === itemId);
+            if (!barang) return showToast('Barang tidak ditemukan', 'error');
+
+            barangDetailAktif = barang;
+            tabDetailAktif = 'unit';
+
+            // Update info header
+            document.getElementById('breadcrumbNama').textContent = barang.nama;
+            document.getElementById('detailBarangNama').textContent = barang.nama;
+            document.getElementById('detailBarangKode').textContent = barang.kode;
+            document.getElementById('detailBarangKategori').textContent = barang.kategori || '-';
+            document.getElementById('detailBarangTipe').textContent = barang.tipe;
+
+            const ketEl = document.getElementById('detailBarangKeterangan');
+            if (barang.keterangan) {
+                ketEl.textContent = barang.keterangan;
+                ketEl.classList.remove('hidden');
+            } else {
+                ketEl.classList.add('hidden');
+            }
+
+            // Sembunyikan tombol Tambah Unit & Hapus kalau bukan aset
+            const btnTambahUnit = document.getElementById('btnDetailTambahUnit');
+            if (barang.tipe === 'stok') {
+                btnTambahUnit.classList.add('hidden');
+            } else {
+                btnTambahUnit.classList.remove('hidden');
+            }
+
+            // Reset tab
+            gantiTabDetail('unit');
+
+            // Pindah halaman
+            gantiHalaman('detail-barang');
+
+            // Load data unit & riwayat
+            await muatUnitBarangDetail(itemId);
+            await muatRiwayatBarangDetail(itemId);
+
+            // Render summary
+            renderSummaryDetailBarang();
+
+            // Update title halaman
+            document.getElementById('pageTitle').textContent = barang.nama;
+            document.getElementById('pageSubtitle').textContent = `Detail barang ${barang.kode}`;
+        }
+
+        async function muatUnitBarangDetail(itemId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('item_units')
+                    .select(`
+                        id, kode_unit, kondisi, status, tgl_masuk, keterangan, location_id,
+                        locations!item_units_location_id_fkey ( id, nama )
+                    `)
+                    .eq('item_id', itemId)
+                    .order('kode_unit', { ascending: true });
+
+                if (error) throw error;
+                unitBarangDetailData = data || [];
+                renderUnitBarangDetail();
+            } catch (err) {
+                console.error('Error load units:', err);
+                showToast('Gagal memuat unit: ' + err.message, 'error');
+            }
+        }
+
+        function renderUnitBarangDetail() {
+            const tbody = document.getElementById('detailUnitTableBody');
+            const empty = document.getElementById('detailUnitEmptyState');
+
+            if (unitBarangDetailData.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            tbody.innerHTML = unitBarangDetailData.map(u => {
+                const kondisiBadge = u.kondisi === 'Baik'
+                    ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">Baik</span>'
+                    : u.kondisi === 'Rusak Ringan'
+                        ? '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400">Rusak Ringan</span>'
+                        : '<span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">Rusak Berat</span>';
+
+                const statusBadge = u.status === 'Aktif'
+                    ? '<span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Aktif</span>'
+                    : u.status === 'Diperbaiki'
+                        ? '<span class="text-xs font-semibold text-amber-600 dark:text-amber-400">Diperbaiki</span>'
+                        : u.status === 'Dibuang'
+                            ? '<span class="text-xs font-semibold text-slate-400">Dibuang</span>'
+                            : '<span class="text-xs font-semibold text-rose-600 dark:text-rose-400">Hilang</span>';
+
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                        <td class="py-3.5 px-5 font-mono text-xs font-bold">${u.kode_unit}</td>
+                        <td class="py-3.5 px-5 text-[13px] text-slate-600 dark:text-slate-400"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${u.locations?.nama || '-'}</td>
+                        <td class="py-3.5 px-5 text-center">${kondisiBadge}</td>
+                        <td class="py-3.5 px-5 text-center">${statusBadge}</td>
+                        <td class="py-3.5 px-5 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="bukaDetailUnit(${u.id})" class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-500 hover:text-blue-600 dark:bg-slate-800 dark:hover:bg-blue-950 transition" title="Detail"><i class="fa-solid fa-eye text-xs"></i></button>
+                                <button onclick="bukaEditUnit(${u.id})" class="p-1.5 rounded-lg bg-slate-100 hover:bg-amber-100 text-slate-500 hover:text-amber-600 dark:bg-slate-800 dark:hover:bg-amber-950 transition" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="bukaHapusUnit(${u.id})" class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950 transition" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function muatRiwayatBarangDetail(itemId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('v_transaksi_lengkap')
+                    .select('*')
+                    .eq('item_id', itemId)
+                    .order('tgl', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+                riwayatBarangDetailData = data || [];
+                renderRiwayatBarangDetail();
+            } catch (err) {
+                console.error('Error load riwayat:', err);
+            }
+        }
+
+        function renderRiwayatBarangDetail() {
+            const tbody = document.getElementById('detailRiwayatTableBody');
+            const empty = document.getElementById('detailRiwayatEmptyState');
+
+            if (riwayatBarangDetailData.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            tbody.innerHTML = riwayatBarangDetailData.map(r => {
+                const isMasuk = r.tipe === 'Masuk';
+                const lokasi = isMasuk ? (r.ke_lokasi || '-') : (r.dari_lokasi || '-');
+                const d = new Date(r.tgl);
+                const tglStr = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) +
+                    ' <span class="text-[10px] text-slate-400">' + d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '</span>';
+
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                        <td class="py-3.5 px-5 text-xs text-slate-600 dark:text-slate-300">${tglStr}</td>
+                        <td class="py-3.5 px-5 font-mono text-[11px] text-slate-500">${r.kode_unit || '-'}</td>
+                        <td class="py-3.5 px-5 text-xs"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${lokasi}</td>
+                        <td class="py-3.5 px-5 text-center text-xs">
+                            ${isMasuk
+                                ? '<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-arrow-down mr-1"></i>Masuk</span>'
+                                : '<span class="text-rose-600 font-semibold"><i class="fa-solid fa-arrow-up mr-1"></i>Keluar</span>'}
+                        </td>
+                        <td class="py-3.5 px-5 text-right font-bold">${formatNumber(r.qty)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderSummaryDetailBarang() {
+            const total = unitBarangDetailData.length;
+            const aktif = unitBarangDetailData.filter(u => u.status === 'Aktif').length;
+            const baik = unitBarangDetailData.filter(u => u.kondisi === 'Baik' && u.status === 'Aktif').length;
+            const rusak = unitBarangDetailData.filter(u => u.kondisi.startsWith('Rusak') && u.status === 'Aktif').length;
+
+            document.getElementById('detailBarangSummary').innerHTML = `
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Total Unit</p>
+                    <p class="text-2xl font-bold text-slate-800 dark:text-white mt-0.5">${total}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Aktif</p>
+                    <p class="text-2xl font-bold text-blue-600 mt-0.5">${aktif}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Baik</p>
+                    <p class="text-2xl font-bold text-emerald-600 mt-0.5">${baik}</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase">Rusak</p>
+                    <p class="text-2xl font-bold text-amber-600 mt-0.5">${rusak}</p>
+                </div>
+            `;
+        }
+
+        function bukaTambahUnitDariDetail() {
+            if (!barangDetailAktif) return;
+            bukaModalTambahUnit();
+            // Pre-select barang
+            setTimeout(() => {
+                document.getElementById('unitBarangSelect').value = barangDetailAktif.itemId;
+                updateUnitPreview();
+            }, 100);
+        }
+
+        function bukaEditBarang() {
+            if (!barangDetailAktif) return;
+            document.getElementById('editBarangId').value = barangDetailAktif.itemId;
+            document.getElementById('editBarangKode').value = barangDetailAktif.kode;
+            document.getElementById('editBarangNama').value = barangDetailAktif.nama;
+            document.getElementById('editBarangTipe').value = barangDetailAktif.tipe;
+            document.getElementById('editBarangSatuan').value = barangDetailAktif.satuan;
+            document.getElementById('editBarangBatasMin').value = barangDetailAktif.minStock;
+            document.getElementById('editBarangKeterangan').value = barangDetailAktif.keterangan || '';
+
+            // Populate kategori
+            const selKat = document.getElementById('editBarangKategori');
+            selKat.innerHTML = daftarKategori.map(k => `<option value="${k.id}">${k.nama}</option>`).join('');
+
+            // Set kategori aktif
+            const currentKat = daftarKategori.find(k => k.nama === barangDetailAktif.kategori);
+            if (currentKat) selKat.value = currentKat.id;
+
+            bukaModal('modalEditBarang');
+        }
+
+        async function handleEditBarang(e) {
+            e.preventDefault();
+            const id = document.getElementById('editBarangId').value;
+            const btn = document.getElementById('btnSubmitEditBarang');
+            const old = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const updateData = {
+                    nama: document.getElementById('editBarangNama').value,
+                    category_id: parseInt(document.getElementById('editBarangKategori').value),
+                    satuan: document.getElementById('editBarangSatuan').value,
+                    batas_min: parseFloat(document.getElementById('editBarangBatasMin').value) || 0,
+                    keterangan: document.getElementById('editBarangKeterangan').value,
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error } = await supabaseClient.from('items').update(updateData).eq('id', id);
+                if (error) throw error;
+
+                showToast('Barang berhasil diupdate!', 'success');
+                tutupModal('modalEditBarang');
+
+                // Refresh data
+                await muatDataDariSupabase();
+
+                // Reopen detail dengan data terbaru
+                const updated = inventoryData.find(i => i.itemId === parseInt(id));
+                if (updated) await bukaDetailBarang(updated.itemId);
+            } catch (err) {
+                showToast('Gagal: ' + err.message, 'error');
+            } finally {
+                btn.innerHTML = old;
+                btn.disabled = false;
+            }
+        }
+
+        async function bukaHapusBarang() {
+            if (!barangDetailAktif) return;
+            const b = barangDetailAktif;
+
+            if (b.tipe === 'aset' && unitBarangDetailData.length > 0) {
+                if (!confirm(`Barang "${b.nama}" masih punya ${unitBarangDetailData.length} unit.\n\nBarang akan diarsipkan (soft delete), tapi unit tetap ada.\n\nLanjutkan?`)) return;
+            } else {
+                if (!confirm(`Arsipkan barang "${b.nama}"?\n\nBarang akan disembunyikan dari daftar, tapi data tetap tersimpan.`)) return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('items')
+                    .update({ status: 'Arsip', updated_at: new Date().toISOString() })
+                    .eq('id', b.itemId);
+
+                if (error) throw error;
+
+                showToast('Barang berhasil diarsipkan', 'success');
+                gantiHalaman('master');
+                await muatDataDariSupabase();
+            } catch (err) {
+                showToast('Gagal: ' + err.message, 'error');
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
     initTheme();
