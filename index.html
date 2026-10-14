@@ -857,7 +857,7 @@
                     .from('item_units')
                     .select(`
                         id, kode_unit, kondisi, status, tgl_masuk, tgl_update, keterangan,
-                        item_id,
+                        item_id, location_id,
                         items!item_units_item_id_fkey ( kode_barang, nama ),
                         locations!item_units_location_id_fkey ( id, nama )
                     `)
@@ -917,11 +917,11 @@
                 return matchSearch && matchBarang && matchLokasi && matchKondisi && matchStatus;
             });
 
-            // Summary
-            const total = unitsData.length;
-            const aktif = unitsData.filter(u => u.status === 'Aktif').length;
-            const baik = unitsData.filter(u => u.kondisi === 'Baik' && u.status === 'Aktif').length;
-            const rusak = unitsData.filter(u => u.kondisi.startsWith('Rusak') && u.status === 'Aktif').length;
+            // Summary - mengikuti filter yang aktif
+                const total = filtered.length;
+                const aktif = filtered.filter(u => u.status === 'Aktif').length;
+                const baik = filtered.filter(u => u.kondisi === 'Baik' && u.status === 'Aktif').length;
+                const rusak = filtered.filter(u => u.kondisi.startsWith('Rusak') && u.status === 'Aktif').length;
             
             document.getElementById('unitSummary').innerHTML = `
                 <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
