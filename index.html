@@ -398,7 +398,7 @@
                         </div>
 
                         <!-- Info Ringkasan -->
-                        <div id="unitSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
+                        <div id="unitSummary" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-4"></div>
 
                         <!-- Tabel Unit -->
                         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
@@ -922,24 +922,29 @@
                 const aktif = filtered.filter(u => u.status === 'Aktif').length;
                 const baik = filtered.filter(u => u.kondisi === 'Baik' && u.status === 'Aktif').length;
                 const rusak = filtered.filter(u => u.kondisi.startsWith('Rusak') && u.status === 'Aktif').length;
-            
+                const dibuang = filtered.filter(u => u.status === 'Dibuang').length;
+
             document.getElementById('unitSummary').innerHTML = `
-                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase">Total Unit</p>
-                    <p class="text-xl font-bold text-slate-800 dark:text-white mt-0.5">${total}</p>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase">Aktif</p>
-                    <p class="text-xl font-bold text-blue-600 mt-0.5">${aktif}</p>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase">Baik</p>
-                    <p class="text-xl font-bold text-emerald-600 mt-0.5">${baik}</p>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-500 uppercase">Rusak</p>
-                    <p class="text-xl font-bold text-rose-600 mt-0.5">${rusak}</p>
-                </div>
+                    <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Total Unit</p>
+                        <p class="text-xl font-bold text-slate-800 dark:text-white mt-0.5">${total}</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Aktif</p>
+                        <p class="text-xl font-bold text-blue-600 mt-0.5">${aktif}</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Baik</p>
+                        <p class="text-xl font-bold text-emerald-600 mt-0.5">${baik}</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Rusak (Aktif)</p>
+                        <p class="text-xl font-bold text-amber-600 mt-0.5">${rusak}</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Dibuang</p>
+                        <p class="text-xl font-bold text-slate-500 mt-0.5">${dibuang}</p>
+                    </div>
             `;
 
             // Table
